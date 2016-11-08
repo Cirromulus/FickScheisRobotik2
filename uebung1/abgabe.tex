@@ -4,6 +4,48 @@
 \maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{09.11.2016}{1} \\
 
 \section*{Aufgabe 1}
+\subsection*{a}
+Grey Walters Schildkröte verwendet zwei Sensoren, zwei Aktuatoren und zwei Vakuumröhren als "`Nervenzellen'". Bei der Sensorik handelt es sich um einen Kontaktsensor und einen Lichtsensor, die Informationen über die Umgebung zur Verfügung stellen. Zum Antrieb wird ein einziges Vorderrad verwendet, dass durch jeweils einen Motor gedreht sowie angetrieben wird.\\
+Der Lichtsensor ist mit der Rotationsachse des Antriebsrads verbunden, sodass immer das Licht in Fahrtrichtung registriert wird.
+\newpage
+
+\subsection*{b}
+\underline{Eingabeparameter:}
+\begin{itemize}
+\item Licht \textbf{L}: Wert, der vom Lichtsensor eingefangen wird.
+\item Licht-Threshold \textbf{t}: Lichtwert, der bestimmt, ab wann eine Lichtquelle als \textit{stark} bezeichnet werden kann.
+\item Batteriezustand \textbf{b}: Gibt an, ob Batterie geladen (Wert = 1) oder beinahe leer (Wert = 0) ist.
+\item Bumpsensor \textbf{obs}: 1, falls der Bumpsensor aktiviert wurde, sonst 0.
+\end{itemize}
+\begin{tikzpicture}[shorten >=1pt,node distance=5cm,on grid,auto] 
+   \node[state,initial] (q_0)   {seek light}; 
+   \node[state] (q_1) [below=of q_0]  {turn/push}; 
+   \node[state] (q_2) [left=of q_0]  {head light};
+   \node[state] (q_3) [right=of q_0]  {back away};
+   \node[state] (q_4) [above=of q_0]  {recharge}; 
+   
+   \path[->]
+   (q_0) edge [bend left] node {obs = 1} (q_1)
+   (q_0) edge [bend left]node [above]{0 < L < t} (q_2)
+   (q_0) edge [bend left]  node [below]{t < L} (q_3)
+   (q_0) edge [bend left = 45] node {b = 0} (q_4)
+   
+   (q_1) edge [bend left] node {obs = 0} (q_0)
+   (q_1) edge [bend left, out=90,in=90,bend angle=180,looseness=2] node {b = 0} (q_4)
+   
+   (q_2) edge [bend left] node [below]{L = 0} (q_0)
+   (q_2) edge [bend right]node {obs = 1} (q_1)
+   (q_2) edge [bend right=40] node [above]{t < L} (q_3)
+   (q_2) edge [bend left]  node {b = 0} (q_4)
+   
+   (q_3) edge [bend left] node [above]{L = 0} (q_0)
+   (q_3) edge [bend left] node {obs = 1} (q_1)
+   (q_3) edge [bend right=40] node [below]{0 < L < t} (q_2)   
+   (q_3) edge [bend right] node [right]{b = 0} (q_4)
+   
+   (q_4) edge [bend left = 45] node {b = 1} (q_0)
+   ;
+\end{tikzpicture}
 
 \section*{Aufgabe 2}
 Die Fusion der Sensorwerte wird mittels einer Maximumfunktion errechnet. Alternativ ist auch der Durchschnitt möglich gewesen, allerdings hätte auf diese Art die Ausgabe eine andere Range gehabt.
@@ -55,10 +97,6 @@ def neugear(light):
     right_actuator = 5 + 10 * (1 - sensors[0])
     logMessage(str(left_actuator) + ":" + str(right_actuator))
 \end{lstlisting}
-
-
-\section*{Aufgabe arsch}
-
 
 \end{document}
 \grid

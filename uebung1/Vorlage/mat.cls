@@ -12,6 +12,8 @@
 \usepackage{graphicx}
 \usepackage{wasysym}
 \usepackage{stmaryrd}
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning}
 
 \newcommand{\thissemester}{WiSe 16/17}
 \newcommand{\thiscourse}{Verhaltensbasierte Robotik}
