@@ -5,6 +5,60 @@
 
 \section*{Aufgabe 1}
 
+\section*{Aufgabe 2}
+Die Fusion der Sensorwerte wird mittels einer Maximumfunktion errechnet. Alternativ ist auch der Durchschnitt möglich gewesen, allerdings hätte auf diese Art die Ausgabe eine andere Range gehabt.
+\subsection*{a) - Liebe}
+\begin{lstlisting}
+def love(light):
+    global right_actuator
+    global left_actuator
+    sensors = sensorFeedback(light)
+    logMessage(str(sensors))
+    left_actuator  = (.9 - sensors[0]) * (.9 - sensors[0]) * 10
+    right_actuator = (.9 - sensors[1]) * (.9     - sensors[1]) * 10
+    logMessage(str(left_actuator) + ":" + str(right_actuator))
+\end{lstlisting}
+
+\subsection*{b) - Aggression}
+\begin{lstlisting}
+def hate(light):
+   global right_actuator
+   global left_actuator
+   sensors = sensorFeedback(light)
+   logMessage(str(sensors))
+   left_actuator  = 10 + ((sensors[1]) * 25) * ((sensors[1]) * 25)
+   right_actuator = 10 + ((sensors[0]) * 25) * ((sensors[0]) * 25)
+   logMessage(str(left_actuator) + ":" + str(right_actuator))
+\end{lstlisting}
+
+\subsection*{c) - Angst}
+\begin{lstlisting}
+def feeeeear(light):
+    global right_actuator
+    global left_actuator
+    sensors = sensorFeedback(light)
+    logMessage(str(sensors))
+    left_actuator  = 1 - 10 * sensors[1]
+    right_actuator = 1 - 10 * sensors[0]
+    logMessage(str(left_actuator) + ":" + str(right_actuator))  
+\end{lstlisting}
+
+
+\subsection*{d) - Neugier}
+\begin{lstlisting}
+def neugear(light):
+    global right_actuator
+    global left_actuator
+    sensors = sensorFeedback(light)
+    logMessage(str(sensors))
+    left_actuator  = 5 + 10 * (1 - sensors[1])
+    right_actuator = 5 + 10 * (1 - sensors[0])
+    logMessage(str(left_actuator) + ":" + str(right_actuator))
+\end{lstlisting}
+
+
+\section*{Aufgabe arsch}
+
 
 \end{document}
 \grid
