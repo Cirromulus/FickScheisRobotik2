@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{wasysym}
 \usepackage{stmaryrd}
+\usepackage{listings}
 \usepackage{tikz}
 \usetikzlibrary{automata,positioning}
 
