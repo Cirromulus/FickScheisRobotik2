@@ -58,8 +58,8 @@ def love(light):
     global left_actuator
     sensors = sensorFeedback(light)
     logMessage(str(sensors))
-    left_actuator  = (.9 - sensors[0]) * (.9 - sensors[0]) * 10
-    right_actuator = (.9 - sensors[1]) * (.9     - sensors[1]) * 10
+    left_actuator  = (.8 - sensors[0]) * (.8 - sensors[0]) * 10
+    right_actuator = (.8 - sensors[1]) * (.8 - sensors[1]) * 10
     logMessage(str(left_actuator) + ":" + str(right_actuator))
     
 def hate(light):
@@ -67,12 +67,12 @@ def hate(light):
     global left_actuator
     sensors = sensorFeedback(light)
     logMessage(str(sensors))
-    left_actuator  = 10 + ((sensors[1]) * 25) * ((sensors[1]) * 25)
-    right_actuator = 10 + ((sensors[0]) * 25) * ((sensors[0]) * 25)
+    left_actuator  = 1 + ((sensors[1]) * 2)
+    right_actuator = 1 + ((sensors[0]) * 2)
     logMessage(str(left_actuator) + ":" + str(right_actuator))
     
     
-def feeeeear(light):
+def fear(light):
     global right_actuator
     global left_actuator
     sensors = sensorFeedback(light)
@@ -89,7 +89,23 @@ def neugear(light):
     logMessage(str(sensors))
     left_actuator  = 5 + 10 * (1 - sensors[1])
     right_actuator = 5 + 10 * (1 - sensors[0])
-    logMessage(str(left_actuator) + ":" + str(right_actuator))    
+    logMessage(str(left_actuator) + ":" + str(right_actuator))
+
+def tortoise(light, distance):
+    sensors = sensorFeedback(light)
+    schwellwert_love = 0.4
+    schwellwert_fear = 0.6
+    if sensors[0] == 0 and sensors[1] == 0:
+        randomWalk(distance)
+    else:
+        if sensors[0] < schwellwert_love and sensors[1] < schwellwert_love:
+            love(light)
+        else:
+            if sensors[0] > schwellwert_fear and sensors[1] > schwellwert_fear:
+                fear(light)
+            else:
+                driveForward(distance)
+
     
 def illegalLove(light):
     i = 0
@@ -118,10 +134,12 @@ def doBehavior(distance, light, marsData):
     if behavior == 1:
         love(light)
     if behavior == 34:
-        feeeeear(light)
+        fear(light)
     if behavior == 6:
         hate(light)
     if behavior == 0:
         neugear(light)
+    if behavior == 3:
+        tortoise(light, distance)
     if behavior == 5:
         randomWalk(distance)
