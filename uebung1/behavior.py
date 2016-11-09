@@ -41,6 +41,7 @@ def driveForward(distance):
     global left_actuator
     left_actuator += distance
     right_actuator += distance
+    logMessage("driveForward:" + str(distance))
         
 def sensorFeedback(light):
     sLeft = 0.
@@ -58,17 +59,17 @@ def love(light):
     global left_actuator
     sensors = sensorFeedback(light)
     logMessage(str(sensors))
-    left_actuator  = (.8 - sensors[0]) * (.8 - sensors[0]) * 10
-    right_actuator = (.8 - sensors[1]) * (.8 - sensors[1]) * 10
-    logMessage(str(left_actuator) + ":" + str(right_actuator))
+    left_actuator  = (0.1/(sensors[0]+0.09))-0.112
+    right_actuator = (0.1/(sensors[1]+0.09))-0.112
+    logMessage("love:" + str(left_actuator) + ":" + str(right_actuator))
     
 def hate(light):
     global right_actuator
     global left_actuator
     sensors = sensorFeedback(light)
     logMessage(str(sensors))
-    left_actuator  = 1 + ((sensors[1]) * 2)
-    right_actuator = 1 + ((sensors[0]) * 2)
+    left_actuator  = 1 + (sensors[0] * sensors[0])
+    right_actuator = 1 + (sensors[1] * sensors[1])
     logMessage(str(left_actuator) + ":" + str(right_actuator))
     
     
@@ -77,9 +78,9 @@ def fear(light):
     global left_actuator
     sensors = sensorFeedback(light)
     logMessage(str(sensors))
-    left_actuator  = 1 - 10 * sensors[1]
-    right_actuator = 1 - 10 * sensors[0]
-    logMessage(str(left_actuator) + ":" + str(right_actuator))    
+    left_actuator  = 0.5 * (sensors[0]-sensors[1]+1.2) * (sensors[0]-sensors[1]+1.2) * (sensors[0]-sensors[1]+1.2) * (sensors[0]-sensors[1]+1.2)
+    right_actuator = 0.5 * (sensors[1]-sensors[0]+1.2) * (sensors[1]-sensors[0]+1.2) * (sensors[1]-sensors[0]+1.2) * (sensors[1]-sensors[0]+1.2)
+    logMessage("fear:" + str(left_actuator) + ":" + str(right_actuator))    
     
     
 def neugear(light):
@@ -94,17 +95,15 @@ def neugear(light):
 def tortoise(light, distance):
     sensors = sensorFeedback(light)
     schwellwert_love = 0.4
-    schwellwert_fear = 0.6
+    schwellwert_fear = schwellwert_love * 1.2
+    logMessage("tortoise: " + str(sensors[0]) + ":" + str(sensors[1]))
     if sensors[0] == 0 and sensors[1] == 0:
         randomWalk(distance)
     else:
         if sensors[0] < schwellwert_love and sensors[1] < schwellwert_love:
             love(light)
         else:
-            if sensors[0] > schwellwert_fear and sensors[1] > schwellwert_fear:
-                fear(light)
-            else:
-                driveForward(distance)
+            fear(light)
 
     
 def illegalLove(light):
