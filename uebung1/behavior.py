@@ -83,7 +83,7 @@ def fear(light):
     logMessage("fear:" + str(left_actuator) + ":" + str(right_actuator))    
     
     
-def neugear(light):
+def curiosity(light):
     global right_actuator
     global left_actuator
     sensors = sensorFeedback(light)
@@ -137,7 +137,7 @@ def doBehavior(distance, light, marsData):
     if behavior == 6:
         hate(light)
     if behavior == 0:
-        neugear(light)
+        curiosity(light)
     if behavior == 3:
         tortoise(light, distance)
     if behavior == 5:
