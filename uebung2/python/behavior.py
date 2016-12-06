@@ -46,13 +46,15 @@ def checkForRed():
 def trackBall():
     global lcam, rcam
     for i in range(len(lcam)):
-        if lcam[i][0] >= 225 and lcam[i][1] <= 100 and lcam[i][2] <= 100:
+        if lcam[i][0] >= 200 and lcam[i][1] <= 100 and lcam[i][2] <= 100:
             #move to zero as center
             approx_vert = i % width - width/2
+            print("rot")
             return ("left", approx_vert)
     for i in range(len(rcam)):
-        if rcam[i][0] >= 225 and rcam[i][1] <= 100 and rcam[i][2] <= 100:
+        if rcam[i][0] >= 200 and rcam[i][1] <= 100 and rcam[i][2] <= 100:
             approx_vert = i % width - width/2
+            print("rot")
             return ("right", approx_vert)
     return ("none", -1)
 
