@@ -4,7 +4,7 @@
 }
 
 \begin{document}
-\maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{irgendwann.12.2016}{2} \\
+\maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{8.12.2016}{2} \\
 
 \section*{Aufgabe 1}
 %Erlautern Sie interne und externe Sensoren und geben Sie jeweils ein Beispiel. Erkl ¨ aren Sie wie ¨
@@ -31,20 +31,23 @@
 %werden. [10 Extra Punkte]
 
 \subsection*{Point Turn}
+Mit dieser Methode kann der Roboter sich auf der Stelle drehen. Die Geschwindigkeit wird aus einer globalen Variable \textit{speed} gezogen.
 \lstinputlisting[linerange={26-30}]{python/behavior.py}
 
 \subsection*{Kamerabildalgorithmus}
+Zur Erkennung des roten Balls wird nach roten Pixeln mit entsprechenden RGB-Werten gesucht. Dabei wurden die Parameter durch \textit{trial and error} ermittelt. Der Algorithmus endet, sobald ein einziges rotes Pixel im Bild gefunden wurde. Als Rückgabe wird ein Tupel zurückgegeben, das zum einen angibt, in welchem Kamerabild das Pixel gefunden wurde. Zum anderen wird die vertikale Position des Pixels im Bild zurückgegeben, wobei die Nullkoordinate in der Mitte des Bildes liegt.
 \lstinputlisting[linerange={57-83}]{python/behavior.py}
 
+Je nach dem, wo sich der Ball im Bild befindet (tendenziell links, tendenziell rechts), wird der Motorwert  gewichtet angepasst. Auf diese Weise wird der Ball in der Mitte der rechten Kamera gehalten.
 \subsection*{Ballfindung}
 \lstinputlisting[linerange={33-41}]{python/behavior.py}
 
 \subsection*{Kugel umrunden}
-Der Roboter kann ziemlich schnell um die Kugel fahren.
+Hier soll die Kugel im Zentrum des Bildes der linken Kamera behalten. Die Motorwerte werden je nach Position des Balls im Bild angepasst, sodass eine kreisförmige Trajektorie abgefahren wird.
 \lstinputlisting[linerange={86-110}]{python/behavior.py}
 
 \subsection*{Kugeln an die Wand}
-Nein.
+Nicht implementiert.
 
 \subsection*{Statemachine}
 \lstinputlisting[linerange={113-144}]{python/behavior.py}
@@ -61,5 +64,7 @@ Nein.
 %kann der Roboter erkennen, dass das Verhalten geandert werden muss? ¨
 %Bitte erklaren und verteidigen Sie ihre implementierte Architektur. [10 Punkte]
 Unsere Architektur benutzt eine Statemachine für die Verwaltung der Zustände.
-Die Kugel wird gefunden, indem der Roboter sich dreht, bis er eine rote Kugel (bzw. Rote Pixel) sieht. Dann dreht er sich (schon leicht fahrend) zu der Kugel, bis sie sich in der Mitte seiner Frontkamera befindet. Dann fährt er geradeaus. Beim Fahren korrigiert er seine Richtung leicht in Abhängigkeit der Verschiebung der Kugel. Wenn die Kugel groß genug ist, wechselt er in den Umrundungsmodus. Dort dreht er sich, bis die Kugel in seiner Seitenkamera auftaucht. Dann fährt er geradeaus und dreht sich gleichzeitig in Abhängigkeit der Position der Kugel. Also fährt der Roboter geradeaus, wenn die Kugel in der Mitte seiner Seitenkamera ist; dreht anteilig links, wenn die Kugel links verschoben ist, und anders herum. Wenn die Kugel aus dem Sichtfeld verschwindet, geht er wieder in den Findungszustand. Diese zustände sind unabhängig voneinander. Die Änderung der Zustände können in jedem Durchlauf einer Bildverarbeitung (\texttt{execute()}) gemacht werden.
+Die Kugel wird gefunden, indem der Roboter sich dreht, bis er eine rote Kugel (bzw. Rote Pixel) sieht. Dann dreht er sich (schon leicht fahrend) zu der Kugel, bis sie sich in der Mitte seiner Frontkamera befindet. Dann fährt er geradeaus. Beim Fahren korrigiert er seine Richtung leicht in Abhängigkeit der Verschiebung der Kugel. Wenn die Kugel groß genug ist, wechselt er in den Umrundungsmodus. Dort dreht er sich, bis die Kugel in seiner Seitenkamera auftaucht. Dann fährt er geradeaus und dreht sich gleichzeitig in Abhängigkeit der Position der Kugel. Also fährt der Roboter geradeaus, wenn die Kugel in der Mitte seiner Seitenkamera ist; dreht anteilig links, wenn die Kugel links verschoben ist, und anders herum. Wenn die Kugel aus dem Sichtfeld verschwindet, geht er wieder in den Findungszustand.\\
+Diese Zustände sind unabhängig voneinander. Alle Verhalten sind in sich geschlossen. States können durch eine \textit{if}-Klausel in der \textit{execute()}-Funktion hinzugefügt werden. \\
+Die Änderung der Zustände können in jedem Durchlauf einer Bildverarbeitung (\texttt{execute()}) gemacht werden. Je mehr Kamerabilder pro Sekunde berechnet werden, desto schneller kann der Roboter um die Kugel kreisen.
 \end{document}
