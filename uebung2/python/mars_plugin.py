@@ -4,9 +4,6 @@ import math
 from euclid import *
 from time import clock
 
-light_pos = []
-light_pos.append(Vector3(3.0, 0.0, 0.1))
-light_sensor = []
 cameraData = {}
 cameraSize = {}
 start_times = {}
@@ -44,14 +41,11 @@ def addCameraData(name, data):
     cameraSize[name] = len(data)/4
 
 def init():
-    global light_sensor
     reload(behavior)
     clearDict()
     rad = 0.97738438112
-    light_sensor = []
     for i in range(8):
         q = Quaternion.new_rotate_axis(rad, Vector3(0, 0, 1));
-        light_sensor.append(q*Vector3(1, 0, 0))
         rad -= 0.27925268032
     setRunning(True)
     requestSensor("position")
@@ -66,6 +60,7 @@ def init():
     #setUpdateTime(10)
     setConfig("Robotik2", "behavior", 0)
     requestConfig("Robotik2", "behavior")
+    start_times['loop'] = clock()
     for camera_name in camera_names:
         requestCameraSensor(camera_name)
         start_times[camera_name] = clock()
@@ -81,8 +76,6 @@ def update(marsData):
     #if "Nodes" in marsData:
         #print str(marsData["Nodes"]["body"]["pos"])
     clearDict()
-    distance = [0, 0, 0, 0, 0, 0, 0, 0]
-    light = [0., 0., 0., 0., 0., 0., 0., 0.]
     sensor_pos = []
     q = Quaternion()
     v = Vector3()
@@ -105,23 +98,13 @@ def update(marsData):
             for i in range(8):
                 sensor_pos.append(Vector3(p[i*3], p[i*3+1], p[i*3+2]))
 
-    for i in range(8):
-        for lightPos in light_pos:
-            lightSensor = q * light_sensor[i]
-            v = lightPos - sensor_pos[i]
-            l = abs(v)
-            if l < 2:
-                angle = math.fabs(lightSensor.angle(v))
-                if angle < 1.04:
-                    l = (2-l)*0.5
-                    l = math.cos(angle*1.5)*l
-                    light[i] += l
-
-    behavior.doBehavior()
+    if(elapsed_time("loop", 1)):
+        behavior.execute(cameraData)
     setMotor("motor_left", - behavior.left_actuator)
     setMotor("motor_right", - behavior.right_actuator)
-    #setMotor("motor_left", -0.2)
-    #setMotor("motor_right", -0.2)
+    print(- behavior.left_actuator)
+    print(- behavior.right_actuator)
+
     for camera_name in camera_names:
         requestCameraSensor(camera_name)
         if elapsed_time(camera_name, 1.):

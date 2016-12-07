@@ -1,13 +1,14 @@
 from mars_interface import *
 import random
-import math
+
 
 random.seed()
 
 lcam = []
 rcam = []
 #threshold for diameter that is considered to be close. Value distinguished by trial and error
-diameterTh = 28
+diameterTh = 25.
+speed = 8.
 
 #coordinates for min and max coordinate of red pixel, used a diameter
 minX = 10000
@@ -15,7 +16,6 @@ maxX = -10000
 state = "pt"
 width = 160
 height = 120
-maxPeed = 4.
 
 right_actuator = 0.
 left_actuator = 0.
@@ -26,19 +26,19 @@ left = 0
 def doPointturn():
     global right_actuator
     global left_actuator
-    right_actuator = 2.0
-    left_actuator = -2.0
+    right_actuator = speed/2.
+    left_actuator = -speed/2.
 
 #approaches the target detected in a frame. need a tuple consiting of (frame as string(eg "left", "right"), pixelPosition which is set aroung 0 as center)
 def approach(position):
     global right_actuator
     global left_actuator
     if(position[0] == "left"):
-        right_actuator = 6.0
-        left_actuator = 4.0
+        right_actuator = speed
+        left_actuator = speed/2
     if(position[0] == "right"):
-        right_actuator = 5.0
-        left_actuator = 5.0 + float(position[1]) / float(width)*5
+        right_actuator = speed
+        left_actuator = speed + float(position[1]) / float(width)*speed
         #print("left actuator: " + str(left_actuator) + ", right actuator: " + str(right_actuator))
 
 #checks for red stuff in cameraframe
@@ -57,7 +57,7 @@ def diameter(minx, maxx):
 def trackBall():
     global lcam, rcam
     global minX,maxX
-    redPix = 0.
+    redPix = 0
     red = False
     for i in range(len(lcam)):
         if lcam[i][0] >= 200. and lcam[i][1] <= 100. and lcam[i][2] <= 100.:
@@ -80,8 +80,9 @@ def trackBall():
             red = True
     if(red):
             return ("right", approx_vert)
-    return ("none", -1.)
+    return ("none", -1)
 
+#circles around the tracked object
 def circle():
     global left_actuator, right_actuator
     global minX, maxX
@@ -95,21 +96,21 @@ def circle():
 
     if(bawl[0] == "left"):
         factor = -.15   #'magic'
-        factor += (bawl[1] / (width / 2.)) * maxPeed
-        logMessage("Factor: " + str(factor))
+        factor += (bawl[1] / (width / 2.)) * speed
+        #logMessage("Factor: " + str(factor))
         if(diameter(minX, maxX) < diameterTh):
             logMessage("Too far away, turning inside a bit")
             factor -= 1.
 
-        left_actuator  = maxPeed / 2. + factor
-        right_actuator = maxPeed / 2. - factor
+        left_actuator  = speed / 2. + factor
+        right_actuator = speed / 2. - factor
+    return True
 
     if(bawl[0] == "none"):
-        state = "pt"
-
+        return False
 
 #simple state machine executing subfunctions
-def execute():
+def execute(camData):
     global state
     global t
     global right_actuator, left_actuator
@@ -117,7 +118,7 @@ def execute():
     minX = 10000
     maxX = -10000
 
-    readData()
+    readData(camData)
     if(state == "pt"):
         doPointturn()
         if(checkForRed() == True):
@@ -126,7 +127,7 @@ def execute():
             return
     if(state == "approach"):
         position = trackBall()
-        print(diameter(minX, maxX))
+        #print(diameter(minX, maxX))
         if(diameter(minX, maxX) >= diameterTh):
             logMessage("now too close! switching to state circle")
             state = "circle"
@@ -138,54 +139,26 @@ def execute():
             state = "pt"
             return
     if(state == "circle"):
-        circle()
+        stillCircling = circle()
+        if(!stillCircling):
+            state = "pt"
 
-#def readData(camData):
-#    global lcam, rcam
-#    width = 160
-#    height = 120
-#    for y in range(height):
-#        yy = height-1-y
-#        for x in range(width):
-#            coord = yy*width*4+x*4
-#            r = camData["cam0"][coord]*255
-#            g = camData["cam0"][coord+1]*255
-#            b = camData["cam0"][coord+2]*255
-#            lcam.append([r,g,b])
-#            r = camData["cam1"][coord]*255
-#            g = camData["cam1"][coord+1]*255
-#            b = camData["cam1"][coord+2]*255
-#            rcam.append([r,g,b])
-
-def readData():
+#reads imagedata from cam array just like in mars_plugin.py
+def readData(camData):
     global lcam, rcam
-    with open('cam1.ppm') as pic:
-        data = pic.read()
-    lcam_split = data.split()
-    r = map(int, lcam_split[4::3])
-    g = map(int, lcam_split[5::3])
-    b = map(int, lcam_split[6::3])
-    lcam = zip(*[r, g, b])
-
-    with open('cam0.ppm') as pic:
-        data = pic.read()
-    rcam_split = data.split()
-    r = map(int, rcam_split[4::3])
-    g = map(int, rcam_split[5::3])
-    b = map(int, rcam_split[6::3])
-    rcam = zip(*[r, g, b])
-
-def doBehavior():
-    global right_actuator, left_actuator
-
-    #behavior = marsData["Config"]["Robotik2"]["behavior"]
-
-    execute()
-
-    #randomWalk(distance)
-
-    # if timing(1):
-    #     message = "sensor:"
-    #     for s in light:
-    #         message += " " + str(s)
-    #     logMessage(message)
+    lcam = []
+    rcam = []
+    width = 160
+    height = 120
+    for y in range(height):
+        yy = height-1-y
+        for x in range(width):
+            #coord = yy*width*4+x*4
+            r = (int)(camData["cam0"][yy*width*4+x*4]*255)
+            g = (int)(camData["cam0"][yy*width*4+x*4+1]*255)
+            b = (int)(camData["cam0"][yy*width*4+x*4+2]*255)
+            rcam.append([r,g,b])
+            r = (int)(camData["cam1"][yy*width*4+x*4]*255)
+            g = (int)(camData["cam1"][yy*width*4+x*4+1]*255)
+            b = (int)(camData["cam1"][yy*width*4+x*4+2]*255)
+            lcam.append([r,g,b])
