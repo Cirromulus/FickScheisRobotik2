@@ -1,4 +1,7 @@
 \documentclass{../Vorlage/mat}
+\lstset{
+	basicstyle=\small
+}
 
 \begin{document}
 \maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{irgendwann.12.2016}{2} \\
@@ -27,6 +30,25 @@
 %Kugeln bis zur Grauen Wand tragen. Dafur m ¨ ussen andere Verhaltenweisen implementiert ¨
 %werden. [10 Extra Punkte]
 
+\subsection*{Point Turn}
+\lstinputlisting[linerange={26-30}]{python/behavior.py}
+
+\subsection*{Kamerabildalgorithmus}
+\lstinputlisting[linerange={57-83}]{python/behavior.py}
+
+\subsection*{Ballfindung}
+\lstinputlisting[linerange={33-41}]{python/behavior.py}
+
+\subsection*{Kugel umrunden}
+Der Roboter kann ziemlich schnell um die Kugel fahren.
+\lstinputlisting[linerange={86-110}]{python/behavior.py}
+
+\subsection*{Kugeln an die Wand}
+Nein.
+
+\subsection*{Statemachine}
+\lstinputlisting[linerange={113-144}]{python/behavior.py}
+
 \section*{Aufgabe 3}
 %Es gibt dann 3 verschiedene reaktive Verhalten hier erlautert: ¨
 %• Kugel Finden.
@@ -38,6 +60,6 @@
 %Verhalten sich geandert w ¨ urde, w ¨ urden die anderen auch ¨ Anderungen brauchen? Wie schnell ¨
 %kann der Roboter erkennen, dass das Verhalten geandert werden muss? ¨
 %Bitte erklaren und verteidigen Sie ihre implementierte Architektur. [10 Punkte]
-
+Unsere Architektur benutzt eine Statemachine für die Verwaltung der Zustände.
+Die Kugel wird gefunden, indem der Roboter sich dreht, bis er eine rote Kugel (bzw. Rote Pixel) sieht. Dann dreht er sich (schon leicht fahrend) zu der Kugel, bis sie sich in der Mitte seiner Frontkamera befindet. Dann fährt er geradeaus. Beim Fahren korrigiert er seine Richtung leicht in Abhängigkeit der Verschiebung der Kugel. Wenn die Kugel groß genug ist, wechselt er in den Umrundungsmodus. Dort dreht er sich, bis die Kugel in seiner Seitenkamera auftaucht. Dann fährt er geradeaus und dreht sich gleichzeitig in Abhängigkeit der Position der Kugel. Also fährt der Roboter geradeaus, wenn die Kugel in der Mitte seiner Seitenkamera ist; dreht anteilig links, wenn die Kugel links verschoben ist, und anders herum. Wenn die Kugel aus dem Sichtfeld verschwindet, geht er wieder in den Findungszustand. Diese zustände sind unabhängig voneinander. Die Änderung der Zustände können in jedem Durchlauf einer Bildverarbeitung (\texttt{execute()}) gemacht werden.
 \end{document}
-\grid
