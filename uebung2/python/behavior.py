@@ -15,7 +15,7 @@ maxX = -10000
 state = "pt"
 width = 160
 height = 120
-maxPeed = 5
+maxPeed = 4.
 
 right_actuator = 0.
 left_actuator = 0.
@@ -57,12 +57,12 @@ def diameter(minx, maxx):
 def trackBall():
     global lcam, rcam
     global minX,maxX
-    redPix = 0
+    redPix = 0.
     red = False
     for i in range(len(lcam)):
-        if lcam[i][0] >= 200 and lcam[i][1] <= 100 and lcam[i][2] <= 100:
+        if lcam[i][0] >= 200. and lcam[i][1] <= 100. and lcam[i][2] <= 100.:
             #move to zero as center
-            approx_vert = i % width - width/2
+            approx_vert = i % width - width/2.
             if(approx_vert < minX):
                 minX = approx_vert
             if(approx_vert > maxX):
@@ -71,8 +71,8 @@ def trackBall():
     if(red):
             return ("left", approx_vert)
     for i in range(len(rcam)):
-        if rcam[i][0] >= 200 and rcam[i][1] <= 100 and rcam[i][2] <= 100:
-            approx_vert = i % width - width/2
+        if rcam[i][0] >= 200. and rcam[i][1] <= 100. and rcam[i][2] <= 100.:
+            approx_vert = i % width - width/2.
             if(approx_vert < minX):
                 minX = approx_vert
             if(approx_vert > maxX):
@@ -80,10 +80,12 @@ def trackBall():
             red = True
     if(red):
             return ("right", approx_vert)
-    return ("none", -1)
+    return ("none", -1.)
 
 def circle():
     global left_actuator, right_actuator
+    global minX, maxX
+    global state
     logMessage("Circling around object!")
 
     bawl = trackBall()
@@ -92,11 +94,17 @@ def circle():
     right_actuator = 0.
 
     if(bawl[0] == "left"):
-        right_actuator = maxPeed / 2.
-        left_actuator = (bawl[1] / (width / 2)) * maxPeed
+        factor = -.15   #'magic'
+        factor += (bawl[1] / (width / 2.)) * maxPeed
+        logMessage("Factor: " + str(factor))
+        if(diameter(minX, maxX) < diameterTh):
+            logMessage("Too far away, turning inside a bit")
+            factor -= 1.
 
-    global state
-    if(bawl[1] == "none"):
+        left_actuator  = maxPeed / 2. + factor
+        right_actuator = maxPeed / 2. - factor
+
+    if(bawl[0] == "none"):
         state = "pt"
 
 
@@ -113,20 +121,20 @@ def execute():
     if(state == "pt"):
         doPointturn()
         if(checkForRed() == True):
-            print("switching to state approach, checkforred is true")
+            logMessage("switching to state approach, checkforred is true")
             state = "approach"
             return
     if(state == "approach"):
         position = trackBall()
         print(diameter(minX, maxX))
         if(diameter(minX, maxX) >= diameterTh):
-            print("now too close! switching to state circle")
+            logMessage("now too close! switching to state circle")
             state = "circle"
             return
         if(position[0] != "none"):
             approach(position)
         else:
-            print("switching to state pt, position equals none")
+            logMessage("switching to state pt, position equals none")
             state = "pt"
             return
     if(state == "circle"):
