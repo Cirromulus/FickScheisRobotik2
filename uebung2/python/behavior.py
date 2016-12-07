@@ -1,13 +1,13 @@
 from mars_interface import *
 import random
-
+import math
 
 random.seed()
 
 lcam = []
 rcam = []
 #threshold for diameter that is considered to be close. Value distinguished by trial and error
-diameterTh = 25
+diameterTh = 28
 
 #coordinates for min and max coordinate of red pixel, used a diameter
 minX = 10000
@@ -15,6 +15,7 @@ maxX = -10000
 state = "pt"
 width = 160
 height = 120
+maxPeed = 5
 
 right_actuator = 0.
 left_actuator = 0.
@@ -83,8 +84,21 @@ def trackBall():
 
 def circle():
     global left_actuator, right_actuator
-    left_actuator = 0.
+    logMessage("Circling around object!")
+
+    bawl = trackBall()
+
+    left_actuator = 1.
     right_actuator = 0.
+
+    if(bawl[0] == "left"):
+        right_actuator = maxPeed / 2.
+        left_actuator = (bawl[1] / (width / 2)) * maxPeed
+
+    global state
+    if(bawl[1] == "none"):
+        state = "pt"
+
 
 #simple state machine executing subfunctions
 def execute():
