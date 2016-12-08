@@ -9,6 +9,11 @@
 \section*{Aufgabe 1}
 %Erlautern Sie interne und externe Sensoren und geben Sie jeweils ein Beispiel. Erkl ¨ aren Sie wie ¨
 %jedes Beispiel, das Sie gegeben haben, funktioniert. [20 Punkte]
+Interne Sensoren messen den Zustand der Roboters (z.B. Wärmesensoren in Gelenken), externe Sensoren dagegen den Zustand der Welt um den Roboter (z.B. Laserscanner). Dabei kann dann noch unterschieden werden zwischen aktiven und passiven Sensoren. Passive messen nur die Welt um sich herum (oder auch den Zustand des Roboters falls es ein interner Sensor ist) (z.B. eine Kamera). Aktive Sensoren manipulieren die Welt (oder was auch immer sie messen wollen) zusätlich noch wie zum Beispiel Laserscanner, die einen Laserstrahl aussenden um Entfernungen zu messen.\\
+\\
+\textbf{Wärmesensoren} funktionieren mittels eines Leiters (Heiß- oder Kaltleiter) der bestromt wird. Dadurch, dass sich der Widerstand des Leiters mit der Temperatur des Leiters ändert kann an der resultierenden Stromstärke die Temperatur des Leiters ermittelt werden. Dies geschieht dann häufig softwareseitig, wo die Stromstärke in die Temperatur umgerechnet wird.\\
+\\
+\textbf{Laserscanner} senden einen Laserstrahl in eine Richtung aus und messen, wie lange es dauert bis dieser zurück kommt. Anhand dieser Messung kann mit Hilfe der Kenntnis über die Lichtgeschwindigkeit die Entfernung zu dem Punkt, von dem er reflektiert wurde ermittelt werden. Dies Passiert nun in hoher geschwindigkeit hintereinander und in verschiedene Richtungen, wodurch eine Punktwolke generiert werden kann, die die Welt um den Roboter abbildet.
 
 \section*{Aufgabe 2}
 %Diese Ubung soll mit Mars gemacht werden. Die Installation von Mars sollten Sie schon in der ¨
