@@ -1,4 +1,5 @@
 \documentclass{../Vorlage/mat}
+\usetikzlibrary{shapes.misc}
 \lstset{
 	basicstyle=\small
 }
@@ -47,6 +48,66 @@ Nach Euklidischer Norm:
 \end{align*}
 
 \section*{Aufgabe B}
+
+\section*{1.}
+\begin{tikzpicture}[cross/.style={draw, cross out,
+	minimum size=2*(#1-1pt), inner sep=0pt, outer sep=0pt}]
+%Raster zeichnen
+\draw [color=gray!50]  [step=5mm] (-.5,-.5) grid (5.5,5.5);
+% Achsen zeichnen
+\draw[->,thick] (0,0) -- (5.5,0) node[right] {$x$};
+\draw[->,thick] (0,0) -- (0,5.5) node[above] {$y$};
+% Achsen beschriften
+\foreach \x in {0,1,2,3,4,5}
+\draw (\x,-.1) -- (\x,.1) node[below=4pt] {$\scriptstyle\x$};
+\foreach \y in {0,1,2,3,4,5}
+\draw (-.1,\y) -- (.1,\y) node[left=4pt] {$\scriptstyle\y$};
+%Punkte einzeichnen:
+\node [cross=3pt,label={A},name=A] at (0,0) {};
+\node [cross=3pt,label={B},name=B] at (5,0) {};
+\node [cross=3pt,label={C},name=C] at (4,5) {};
+
+\draw [thick, -] (A)--(B);
+\draw [thick, -] (A)--(C);
+\draw [thick, -] (B)--(C);
+
+\end{tikzpicture}
+\subsection*{2.}
+\subsubsection*{Winkel bei A}
+$$\overrightarrow{a_1}= \overrightarrow{AC}=C-A=\binom{4}{5} - \binom{0}{0} = \binom{4}{5}$$
+$$|\overrightarrow{a_1}| = \sqrt{4^2+5^2} = \sqrt{41}$$
+$$\overrightarrow{a_2} = \overrightarrow{AB} = B-A = \binom{5}{0} - \binom{0}{0} = \binom{5}{0}$$
+$$|\overrightarrow{a_2}| =\sqrt{5^2+0^2} = \sqrt{25} = 5$$
+$$ \cos{(\frac{\overrightarrow{a_1}\ast\overrightarrow{a_2}}{|\overrightarrow{a_1}|\cdot|\overrightarrow{a_2}|})} = \frac{4\cdot 5 + 5 \cdot 0}{\sqrt{41}\cdot 5} = \frac{20}{\sqrt{41}\cdot 5}$$
+$$\alpha = \arccos{(\frac{20}{\sqrt{41}\cdot 5})} = 51^\circ = 2\pi\frac{51^\circ}{360^\circ} = 0,89 rad$$
+
+\subsubsection*{Winkel bei B}
+$$\overrightarrow{b_1}= \overrightarrow{BA}=A-B=\binom{0}{0} - \binom{5}{0} = \binom{-5}{0}$$
+$$|\overrightarrow{b_1}| = \sqrt{(-5)^2+0^2} = \sqrt{25} = 5 $$
+$$\overrightarrow{b_2} = \overrightarrow{BC} = C-B = \binom{4}{5} - \binom{5}{0} = \binom{-1}{5}$$
+$$|\overrightarrow{b_2}| =\sqrt{(-1)^2+5^2} = \sqrt{26}$$
+$$ \cos{(\frac{\overrightarrow{b_1}\ast\overrightarrow{b_2}}{|\overrightarrow{b_1}|\cdot|\overrightarrow{b_2}|})} = \frac{(-5)\cdot (-1) + 0 \cdot 5}{5\cdot \sqrt{26}} = \frac{5}{5\cdot\sqrt{26}}$$
+$$\beta = \arccos{(\frac{5}{5\cdot\sqrt{26}})} = 79^\circ = 2\pi\frac{79^\circ}{360^\circ} = 1,38 rad$$
+
+\subsubsection*{Winkel bei C}
+$$\overrightarrow{c_1}= \overrightarrow{CB}=B-C=\binom{5}{0} - \binom{4}{5} = \binom{1}{-5}$$
+$$|\overrightarrow{c_1}| = \sqrt{1^2+(-5)^2} = \sqrt{26}$$
+$$\overrightarrow{c_2} = \overrightarrow{CA} = A-C = \binom{0}{0} - \binom{4}{5} = \binom{-4}{-5}$$
+$$|\overrightarrow{c_2}| =\sqrt{(-4)^2+(-5)^2} = \sqrt{41}$$
+$$ \cos{(\frac{\overrightarrow{c_1}\ast\overrightarrow{c_2}}{|\overrightarrow{c_1}|\cdot|\overrightarrow{c_2}|})} = \frac{1\cdot (-4) + (-5) \cdot (-5)}{\sqrt{26} \cdot \sqrt{41}} = \frac{21}{\sqrt{26} \cdot \sqrt{41}}$$
+$$\gamma = \arccos{(\frac{21}{\sqrt{26} \cdot \sqrt{41}})} = 50^\circ = 2\pi\frac{50^\circ}{360^\circ} = 0,87 rad$$
+
+\subsubsection*{Summe der Innenwinkel}
+$$ \alpha + \beta + \gamma = 51^\circ+79^\circ+50^\circ = 180^\circ = \pi rad$$
+
+
+\subsection*{3.}
+$$ a = \overrightarrow{BC} = C-B = \binom{4}{5}-\binom{5}{0}= \binom{-1}{5} $$
+$$ b = \overrightarrow{CA} = A-C = \binom{0}{0}-\binom{4}{5}= \binom{-4}{-5} $$
+$$ c = \overrightarrow{AB} = B-A = \binom{5}{0}-\binom{0}{0}= \binom{5}{0} $$
+
+\subsection*{4.}
+Nothing
 
 
 \section*{Aufgabe C}
