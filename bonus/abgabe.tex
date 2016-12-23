@@ -8,14 +8,14 @@
 
 \section*{Aufgabe A}
 \begin{align*}
-\Phi & = 2 \pi \cdot \frac{47^{\circ}}{360^{\circ}}\\
+\phi & = 2 \pi \cdot \frac{47^{\circ}}{360^{\circ}}\\
 & = 0.820304748437 
 \end{align*}
 
 \subsection*{a}
 \begin{align*}
-z & = exp(\imath \cdot \Phi)\\
-& = cos(\Phi) + sin(\Phi)i\\
+z & = exp(\imath \cdot \phi)\\
+& = cos(\phi) + sin(\phi)i\\
 & = cos(0.820304748437) + sin(0.820304748437)i\\
 z & = 0.681998360062 + 0.731353701619i
 \end{align*}
@@ -53,6 +53,61 @@ Nach Euklidischer Norm:
 
 
 \section*{Aufgabe D}
-
+\subsection*{2}
+\begin{align*}
+\phi & = 2 \pi \cdot \frac{70^{\circ}}{360^{\circ}}\\
+& = 0.820304748437 
+\hat{n} & = (0,1,0)^T
+\end{align*}
+\subsection*{(a)}
+\begin{align*}
+R^{(2)} & = exp(\phi \cdot \hat{n}^\otimes) = I + sin(\phi) \cdot \hat{n}^\otimes + (1 - cos(\phi)) \cdot (\hat{n}^\otimes)^2\\
+& = 
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0\\
+0 & 0 & 1 \\
+\end{pmatrix} + sin(\phi) \cdot
+\begin{pmatrix}
+0 & 0 & 1 \\
+0 & 0 & 0 \\
+-1 & 0 & 0 \\
+\end{pmatrix} + (1 - cos(\phi)) \cdot
+\begin{pmatrix}
+0 & 0 & 1 \\   
+0 & 0 & 0 \\
+-1 & 0 & 0 \\
+\end{pmatrix}^2 						\\
+& = 
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0\\
+0 & 0 & 1 \\
+\end{pmatrix} +
+\begin{pmatrix}
+0 & 0 & 0.939 \\
+0 & 0 & 0 \\
+-0.939 & 0 & 0 \\
+\end{pmatrix} + 
+\begin{pmatrix}
+0 & 0 & 0.658 \\   
+0 & 0 & 0 \\
+0.658 & 0 & 0 \\
+\end{pmatrix} 						\\
+R^{(2)} & =  
+\begin{pmatrix}
+1 & 0 & 1.5976 \\
+0 & 1 & 0\\
+-0.2817 & 0 & 1 \\
+\end{pmatrix}
+\end{align*}
+%0.939 sin 
+% 1 - cos phi = 0.657979856674
+\subsection*{(b)}
+\begin{align*}
+\hat{q} & = cos(\frac{\phi}{2}) + sin(\frac{\phi}{2}) \cdot j * \hat{n}\\
+& = 0.819152 + (0.573576j,0.573576k,0.573576l)^T * (0,1,0)^T\\
+\hat{q} & = (0.819152, 0, 0.573576k, 0)
+\end{align*}
 
 \end{document}
