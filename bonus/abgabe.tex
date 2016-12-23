@@ -50,6 +50,173 @@ Nach Euklidischer Norm:
 
 
 \section*{Aufgabe C}
+\begin{tikzpicture}
+	\draw[->,thick] (-4,0) -- (2,0) node[right] {$x$};
+	\draw[->,thick] (0,-3) -- (0,3) node[above] {$y$};
+	
+	\foreach \x in {-3,-2,-1,1}
+	\draw (\x,-.1) -- (\x,.1) node[below=4pt] {$\x$};
+	\foreach \y in {-2,-1,1,2}
+	\draw (-.1,\y) -- (.1,\y) node[left=4pt] {$\y$};
+	\draw (0,0) -- (0,0) node[below right] {$0$};
+	
+	%Aufgabe 2
+	\draw[blue,thick] (0,0) circle [radius=1];
+	\draw[red,thick] (-1,0) circle [radius=2];
+	
+	%Aufgabe 3
+	\draw[blue,thick] (0,0) -- (0.682,0.731) node[] {};
+	\draw[red,thick] (0,0) -- (-0.313,-0.950) node[] {};
+	
+	%Aufgabe 4
+	\draw[blue,thick,dashed] (-1,0) -- (0.834,0.797) node[] {};
+	\draw[red,thick,dashed] (-1,0) -- (0.172,-1.62) node[] {};
+	
+	
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+	\draw[blue,thick,circle] (0,0) circle [radius=0.1];
+	\node at (1,0) {$C'$};
+	\draw[red,thick,circle] (0,-0.5) circle [radius=0.1];
+	\node at (1,-0.5) {$C''$};
+	\draw[blue,thick] (0,-1) -- (0.3,-1);
+	\node at (1,-1) {$w_1$};
+	\draw[red,thick] (0,-1.5) -- (0.3,-1.5);
+	\node at (1,-1.5) {$w_2$};
+	\draw[blue,thick,dashed] (0,-2) -- (0.3,-2);
+	\node at (1,-2) {$u_1$};
+	\draw[red,thick,dashed] (0,-2.5) -- (0.3,-2.5);
+	\node at (1,-2.5) {$u_1$};
+\end{tikzpicture}
+
+
+\subsection*{3}
+$\phi_1 = 2 \pi \cdot \frac{47^\circ}{360^\circ} = 0,820$\\
+$R_1 = 
+\begin{bmatrix}
+cos \phi_1 & -sin \phi_1\\
+sin \phi_1 & cos \phi_1\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+0,682 & -0,731\\
+0,731 & 0,682\\
+\end{bmatrix}$\\
+$w_1 = R_1 \cdot v =
+\begin{bmatrix}
+0,682 & -0,731\\
+0,731 & 0,682\\
+\end{bmatrix}
+\cdot
+\begin{pmatrix}
+1\\
+0\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+0,682\\
+0,731\\
+\end{pmatrix}
+$\\
+\\
+$\phi_2 = 2 \pi \cdot \frac{-108^\circ}{360^\circ} = -1,889$\\
+$R_2 = 
+\begin{bmatrix}
+cos \phi_2 & -sin \phi_2\\
+sin \phi_2 & cos \phi_2\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+-0,313 & 0,950\\
+-0,950 & -0,313\\
+\end{bmatrix}$\\
+$w_2 = R_2 \cdot v =
+\begin{bmatrix}
+-0,313 & 0,950\\
+-0,950 & -0,313\\
+\end{bmatrix}
+\cdot
+\begin{pmatrix}
+1\\
+0\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+-0,313\\
+-0,950\\
+\end{pmatrix}
+$\\
+\\
+\subsection*{4}
+$u'_1 = w_1 - c'' =
+\begin{pmatrix}
+0,682\\
+0,731\\
+\end{pmatrix}
+-
+\begin{pmatrix}
+-1\\
+0\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+1,682\\
+0,731\\
+\end{pmatrix}$\\
+
+$u_1 = \vec{u'}^0_1 \cdot 2 = 
+\begin{pmatrix}
+1,682\\
+0,731\\
+\end{pmatrix} / \sqrt{1,682^2+0,731^2} \cdot 2 = 
+\begin{pmatrix}
+1,834\\
+0,797\\
+\end{pmatrix}
+$\\
+
+
+$u'_2 = w_2 - c'' =
+\begin{pmatrix}
+-0,313\\
+-0,950\\
+\end{pmatrix}
+-
+\begin{pmatrix}
+-1\\
+0\\
+\end{pmatrix}
+=
+\begin{pmatrix}
+0,687\\
+-0,950\\
+\end{pmatrix}$\\
+
+$u_2 = \vec{u'}^0_2 \cdot 2 = 
+\begin{pmatrix}
+0,687\\
+-0,950\\
+\end{pmatrix} / \sqrt{0,687^2+(-0,950)^2} \cdot 2 = 
+\begin{pmatrix}
+1,172\\
+-1,620\\
+\end{pmatrix}
+$
+
+\subsection*{5}
+$ \varphi_1 = \mathtt{atan2}(0.797,1.834) = 0,410 = 23,488^\circ$\\
+$ \varphi_2 = \mathtt{atan2}(-1.620,1.172) = -0,945 = -54,116^\circ$\\
+\\
+$ \frac{\varphi_1}{\phi_1} = \frac{0,410}{0,820} = 0.500$\\
+$ \frac{\varphi_2}{\phi_2} = \frac{-0,945}{-1,889} = 0.500$
+
+\subsection*{6}
+$\mathtt{tan}(\phi_1/2) = 0.435$\\
+$\mathtt{tan}(\phi_2/2) = 1.382$\\
+
+Die Werte entsprechen den y Werten der beiden eingezeichneten, also um (-1,0) verschobenen, Vektoren $u_1$ und $u_2$ an ihrem jeweiligen Schnittpunkt mit der y-Achse.
 
 
 \section*{Aufgabe D}
