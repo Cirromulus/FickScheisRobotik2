@@ -1,0 +1,71 @@
+\documentclass{../Vorlage/mat}
+\lstset{
+	basicstyle=\small
+}
+
+\begin{document}
+\maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{11.01.2017}{3} \\
+
+\section*{Aufgabe 1}
+%A* SHEET
+
+
+\section*{Aufgabe 2}
+\subsection*{Definiert Sachen:}
+\textbf{\_Essen(Rolf, Gericht)\_}\\
+Preconditions: At(Rollstuhl, Esszimmer) $\wedge$ At(Gericht, Esszimer) $\wedge$ Nahrung(Gericht) $\wedge$ (Hungrig(Rolf) $\vee \neg$Hungrig(Rolf))\\
+Postconditions: Satt(Rolf)
+
+
+\textbf{\_Bewegen(Rollstuhl, Start, Ziel)\_}\\
+Preconditions: Room(Start)$\wedge$Room(Ziel)$\wedge$At(Rollstuhl, Start) $\wedge$  Door(Start,open) $\wedge$ Door(Ziel,open)\\
+Postconditions: At(Rollstuhl, Ziel)
+
+
+\textbf{\_TürÖffnen(Tür)\_}\\
+Preconditions: Door(Tür, closed)\\
+Postconditions: Door(Tür, open)
+
+
+\textbf{\_TürSchließen(Tür)\_}\\
+Preconditions: Door(Tür, open)\\
+Postconditions: Door(Tür, closed)
+
+
+\textbf{\_Tragen(Dings, Start, Ziel)\_}\\
+Preconditions: At(Rollstuhl, Dings) $\wedge$  Door(Start,open) $\wedge$ Door(Ziel,open)\\
+Postconditions: At(Dings, Ziel), $\wedge$ At(Rollstuhl, Ziel)
+
+\subsection*{Gebt Reihenfolgen an:}
+%Init (Hungrig(Rolf) $\wedge$ at(Rollstuhl, Wohnzimmer) $\wedge$ At(Fertiggericht, Küche) $\wedge$ Door(Küche, closed) $\wedge$ Door(Wohnzimmer, closed) $\wedge$ Door(Esszimmer, closed) $\wedge$ Room(Küche) $\wedge$ Room(Esszimmer) $\wedge$ Room(Wohnzimmer) $\wedge$ Nahrung(Fertiggericht))
+
+Init (Hungrig(Rolf) $\wedge$ at(Rollstuhl, Wohnzimmer) $\wedge$ At(Fertiggericht, Küche) $\wedge$ \underline{Door(Küche, closed)} $\wedge$ \underline{Door(Wohnzimmer, closed)} $\wedge$ \underline{Door(Esszimmer, closed)} $\wedge$ Room(Küche) $\wedge$ Room(Esszimmer) $\wedge$ Room(Wohnzimmer) $\wedge$ Nahrung(Fertiggericht))
+
+TürÖffnen(Wohnzimmer), TürÖffnen(Küche), Türöffnen(Esszimmer)
+
+(Hungrig(Rolf) $\wedge$ at(Rollstuhl, Wohnzimmer) $\wedge$ At(Fertiggericht, Küche) $\wedge$ \textit{\underline{Door(Küche, open)}} $\wedge$ \textit{\underline{Door(Wohnzimmer, open)}} $\wedge$ \textit{Door(Esszimmer, open)} $\wedge$ \underline{Room(Küche)} $\wedge$ Room(Esszimmer) $\wedge$ \underline{Room(Wohnzimmer)} $\wedge$ Nahrung(Fertiggericht))
+
+Bewegen(Rollstuhl, Wohnzimmer, Küche)
+
+(Hungrig(Rolf) $\wedge$ \underline{\textit{at(Rollstuhl, Küche)} $\wedge$ At(Fertiggericht, Küche)} $\wedge$ \underline{Door(Küche, open)} $\wedge$ Door(Wohnzimmer, open) $\wedge$ \underline{Door(Esszimmer, open)} $\wedge$ \underline{Room(Küche)} $\wedge$ \underline{Room(Esszimmer)} $\wedge$ Room(Wohnzimmer) $\wedge$ Nahrung(Fertiggericht))
+
+Tragen(Fertiggericht, Küche, Esszimmer)
+
+(Hungrig(Rolf) $\wedge$ \underline{\textit{at(Rollstuhl, Esszimmer) $\wedge$ At(Fertiggericht, Esszimmer)}} $\wedge$ Door(Küche, open) $\wedge$ Door(Wohnzimmer, open) $\wedge$ Door(Esszimmer, open) $\wedge$ Room(Küche) $\wedge$ Room(Esszimmer) $\wedge$ Room(Wohnzimmer) $\wedge$ Nahrung(Fertiggericht))
+
+Essen(Fertiggericht)
+
+(\textit{Satt(Rolf)} $\wedge$ \underline{at(Rollstuhl, Esszimmer)} $\wedge$ Door(Küche, open) $\wedge$ \underline{Door(Wohnzimmer, open)} $\wedge$ \underline{Door(Esszimmer, open)} $\wedge$ Room(Küche) $\wedge$ \underline{Room(Esszimmer)} $\wedge$ \underline{Room(Wohnzimmer)})
+
+Bewegen(Rollstuhl, Wohnzimmer)
+
+(Satt(Rolf) $\wedge$ \textit{at(Rollstuhl, Wohnzimmer)}$\wedge$ Door(Küche, open) $\wedge$ \underline{Door(Wohnzimmer, open)} $\wedge$ Door(Esszimmer, open) $\wedge$ Room(Küche) $\wedge$ Room(Esszimmer) $\wedge$ Room(Wohnzimmer))
+
+TürSchließen(Wohnzimmer)
+
+(Satt(Rolf) $\wedge$ at(Rollstuhl, Wohnzimmer) $\wedge$ Door(Küche, open) $\wedge$ \textit{Door(Wohnzimmer, closed)} $\wedge$ Door(Esszimmer, open) $\wedge$ Room(Küche) $\wedge$ Room(Esszimmer) $\wedge$ Room(Wohnzimmer))
+
+
+\subsection*{A* for STRIPS}
+NAY
+\end{document}
