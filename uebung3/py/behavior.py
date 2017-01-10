@@ -4,17 +4,18 @@ import intersect
 import math
 import numpy as np
 
-goal = [4.,4.]
-nodes = []
-wps = []
-ini = False
+goal = [4.,4.]  #change value for new goal
+nodes = []      #list of nodes
+wps = []        #list of waypoint vectors
+ini = False     #check if already initialized or not
 
+#datastucture used for handling coordinates and predecessors of wapoints
 class Node:
-    comingFrom = None
-    sDistance = 10000000.
-    gDistance = 10000000.
+    comingFrom = None   #reference to predecessor
+    sDistance = 10000000.    #shortest path from start to goal
+    gDistance = 10000000.    #heuristical score. Used is the current shortest distance + euclidean distance to goal
     coords = [0.,0.]
-    neighbours = []
+    neighbours = []     #neighbour nodes, where a neighbour is a node that is visible from predecessor
 
     def __init__(self, coords):
         self.coords = coords
@@ -26,19 +27,7 @@ class Node:
         else:
             return NotImplemented
 
-    #def expand(self):
-
-
-#def calcNeighbours(pos):
-#    global wps
-#    neighbours = []
-#    for wp in wps:
-#        #print "pos "+ str(pos) + " wp " + str(wp)
-#        if(not np.array_equal(wp, pos) and checkIntersect(pos, wp)):
-#            n = Node(wp)
-#            neighbours.append(n)
-#    return neighbours
-
+#calculate neighbours of a given node
 def calcNeighbourNodes(node):
     global nodes
     neighbours = []
@@ -48,6 +37,7 @@ def calcNeighbourNodes(node):
             neighbours.append(n)
     return neighbours
 
+#use waypoints to create all nodes and add goal to waypoint
 def initNodes():
     global wps, nodes, goal
     wps.append(goal)
@@ -67,6 +57,7 @@ def constructPath(node):
         path.append(np.array(i.comingFrom.coords))
         i = i.comingFrom
     path.append(np.array(i.coords))
+    #needed in reverse
     result = path[::-1]
     return result
 
@@ -74,10 +65,10 @@ def constructPath(node):
 def aStar(pos):
     global nodes, goal
     path = []
-    #print "goal is: " + str(goal)
     pos2d = [pos[0], pos[1]]
     openList = []
     closedList = []
+    #add startnode, given by robotposition
     start = Node(pos2d)
     start.comingFrom = None
     start.sDistance = 0
@@ -90,14 +81,11 @@ def aStar(pos):
         if current.coords == goal:
             #print "FOUND PATH"
             path = constructPath(current)
-            #print path
             return path
         openList.remove(current)
-        #print len(openList)
         closedList.append(current)
-        #print "current is: " + str(current.coords)
 
-        #print "nachbarn: " + str(len(current.neighbours))
+        #EXPANSION of current node
         for n in current.neighbours:
             if n in closedList:
                 continue
@@ -113,7 +101,7 @@ def aStar(pos):
             n.hDistance = n.sDistance + dist(n.coords, goal)
 
 
-    #print "did not find a path"
+    #failed, so returning an empty path
     return path
 
 def checkIntersect(pos, wp):
@@ -129,6 +117,7 @@ def dist(p1, p2):
 
 def doBehavior(distance, marsData, waypoints, walls, pos):
     global ini, wps, nodes
+    #calculating the neighbours just once!
     if not ini:
         for wp in waypoints:
             wps.append([wp[0], wp[1]])
@@ -140,19 +129,11 @@ def doBehavior(distance, marsData, waypoints, walls, pos):
 
     result = aStar(pos)
 
+    #drawing path
     for i in range(len(result)-1):
         print result[i]
         appendLines("path", result[i][0], result[i][1], 0.5)
         appendLines("path", result[i+1][0], result[i+1][1], 0.5)
-
-#    for wp in waypoints:
-#        if checkIntersect(pos,wp):
-#             #print str(pos[0]) + ":" + str(pos[1]) + " to " + str(wp[0]) + ":" + str(wp[1]) + ": no intersection"
-#             appendLines("path", pos[0], pos[1], 0.5)
-#             appendLines("path", wp[0], wp[1], 0.5)
-
-
-
 
 #    message = "sensor:"
 
