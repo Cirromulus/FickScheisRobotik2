@@ -67,5 +67,21 @@ TürSchließen(Wohnzimmer)
 
 
 \subsection*{A* for STRIPS}
-NAY
+\textbf{Expansion}\\
+Auf Basis des aktuellen Zustandes wird geprüft, welche Aktionen ausgeführt werden können. Dann werden die möglichen Folgezustände ermittelt, indem die möglichen Aktionen auf den aktuellen Zustand angewendet werden. Für die Folgezustände, die nicht der closedList stehen, werden die Heuristik und die Kosten berechnet und dann die Zustände zur openList hinzugefügt. Zum Schluss wird der Basiszustand von der openList entfernt und zur closedList hinzugefügt.\\
+\\
+\textbf{Heuristik}\\
+Sei:\\
+$T = $ Menge der Teilzustände im Zielzustand\\
+$F = $ Menge der Teilzustände im betrachteten Zustand\\
+$S = T \bigcap F$\\
+\\
+Eine mögliche Heuristik wäre: $h(x) = \frac{|S|}{|T|}$\\
+Dabei wäre die Heuristik zu maximieren.\\
+\\
+\textbf{Kosten}\\
+Die Kosten für die Transition von einem Zustand in einen möglichen Folgezustand könnten an der dafür nötigen Aktion festgemacht werden. Hier könnte zum Beispiel die Anzahl der Effekte der Aktion als Kosten der Funktion festgelegt werden. Dabei wäre dann irrelevant, wie viele Einzelaktionen ausgeführt werden würden, sondern nur relevant, wie viele Effekte insgesamt auftreten würden. Um die Anzahl der ausgeführten Aktionen mit einzubeziehen, könnten die Kosten als Anzahl der Effekte einer Aktion plus eins festgelegt werden.\\
+\\
+\textbf{Kann man A* einsetzen um STRIPS Probleme zu lösen?}
+Ja, dies ist mit dem oben gemachten Angaben möglich.
 \end{document}
