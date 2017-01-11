@@ -7,11 +7,150 @@
 \maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{11.01.2017}{3} \\
 
 \section*{Aufgabe 1}
-%A* SHEET
+\subsection*{a)}
+\lstset{language=python}
+Die Implementierung des $A^{\star}$-Algorithmus erfolgt in der \textit{behaviour.py} . Das Ziel ist veränderbar, wenn die \textit{goal}-Variable über der Implementierung angepasst wird (standartmäßig auf 4.0, 4.0).\\
+Um das Datenmanagement zu vereinfachen, wurde eine Klasse \textit{Node} entworfen. Diese speichert die benötigten Werte wie kürzeste Distanz, heuristische Bewertung für die Auswahl, Koordinaten und eine Referenz auf den Vorgänger. Die heuristische Bewertung ergibt sich dabei aus der aktuell kürzesten Distanz zu diesem Knoten + Distanz mittels euklidischer Norm zum Ziel.
 
+\begin{lstlisting}
+#datastucture used for handling coordinates and predecessors of wapoints
+class Node:
+    comingFrom = None   #reference to predecessor
+    sDistance = 10000000.    #shortest path from start to goal
+    gDistance = 10000000.    #heuristical score.
+    coords = [0.,0.]
+    neighbours = []     #neighbour nodes
+
+    def __init__(self, coords):
+        self.coords = coords
+        self.comingFrom = self
+
+    def __eq__(self, other):
+        if isinstance(other, Node):
+            return self.coords == other.coords
+        else:
+            return NotImplemented
+\end{lstlisting}
+
+Die Knoten werdne einmalig initialisiert. Das heißt zum einen, dass entsprechende Knoten zu allen Wegpunkten erstellt werden. Darüber hinaus werden die Nachbarknoten einmalig berechnet und in den Knoten gespeichert, um diese nicht bei jeder Iteration des $A^{\star}$ zu berechnen. Dabei sind mögliche Nachbarn all jene Wegpunkte, die direkt sichtbar und somit nicht durch eine Wand versperrt werden.
+
+\begin{lstlisting}
+#calculate neighbours of a given node
+def calcNeighbourNodes(node):
+    global nodes
+    neighbours = []
+    for n in nodes:
+        if(not np.array_equal(n.coords, node.coords) 
+        and checkIntersect(n.coords, node.coords)):
+            neighbours.append(n)
+    return neighbours
+\end{lstlisting}
+
+Der eigentliche Algorithmus ist nach den Vorgaben der Tutoriumsfolien implementiert worden. Die Dokumentation der einzelnen Schritte geht aus den Kommentaren des Quellcodes hervor.
+
+\begin{lstlisting}
+def aStar(pos):
+    global nodes, goal
+    path = []
+    pos2d = [pos[0], pos[1]]
+    openList = []
+    closedList = []
+    #add startnode, given by robotposition
+    start = Node(pos2d)
+    start.comingFrom = None
+    start.sDistance = 0
+    start.hDistance = dist(start.coords, goal)
+    start.neighbours = calcNeighbourNodes(start)
+    openList.append(start)
+
+    while openList:
+        #find node with lowest heuristic score
+        current = min(openList, key=lambda x: x.hDistance)
+        if current.coords == goal:
+            #print "FOUND PATH"
+            path = constructPath(current)
+            return path
+        #remove from openList since it is going to be expanded now
+        openList.remove(current)
+        closedList.append(current)
+
+        #EXPANSION of current node
+        for n in current.neighbours:
+            #successor already checked, continue
+            if n in closedList:
+                continue
+            #calculate distance travelled on this path
+            tempDist = current.sDistance + dist(current.coords, n.coords)
+
+            #add neighbour to openList
+            if n not in openList:
+                openList.append(n)
+            #dont update distance if path is longer than the one before
+            elif tempDist >= n.sDistance:
+                continue
+
+            # update neighbour's data
+            n.comingFrom = current
+            n.sDistance = tempDist
+            n.hDistance = n.sDistance + dist(n.coords, goal)
+
+
+    #failed, so returning an empty path
+    return path
+\end{lstlisting}
+
+Die Rekonstruktion des Pfades erfolgt durch die rekursive Ausgabe der Koordinaten der jeweiligen Vorgängerknoten, bis kein Vorgänger bekannt ist.
+
+\begin{lstlisting}
+#reconstruct from goalnode
+def constructPath(node):
+    i = node
+    path = []
+    path.append(np.array(i.coords))
+    while i.comingFrom != None:
+        path.append(np.array(i.comingFrom.coords))
+        i = i.comingFrom
+    path.append(np.array(i.coords))
+    #needed in reverse
+    result = path[::-1]
+    return result
+\end{lstlisting}
+\newpage
+\subsection*{b)}
+\begin{figure}[!htbp]
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{astar_start.png}
+  \captionof{figure}{$A^{\star}$ angewendet von der Startposition}
+  \label{fig1}
+\end{minipage}%%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.21]{astar_downleft.png}
+  \captionof{figure}{$A^{\star}$ angewendet im Raum im Südwesten}
+  \label{fig2}
+\end{minipage}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.2]{astar_topleft.png}
+  \captionof{figure}{$A^{\star}$ angewendet im Raum im Nordwesten}
+  \label{fig3}
+\end{minipage}%%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[scale=0.21]{astar_downmiddle.png}
+  \captionof{figure}{$A^{\star}$ angewendet im Raum im Süden}
+  \label{fig4}
+\end{minipage}
+\end{figure}
+
+In den  Abbildungen \ref{fig3} und \ref{fig4} ist eine Problematik zu erkennen, die bei der Verwendung eines Braitenbergvehikels auftreten können: während die Bewegung auf Flächen ohne Hindernissen gut funktionieren würde, gäbe es erst Probleme beim Durchqueren der Türen. Hier wird nicht mit der Dimension des Roboters in der realen Welt gerechnet, sodass es gegen den Türrahmen fahren würde.
+\newpage
 
 \section*{Aufgabe 2}
-\subsection*{Definiert Sachen:}
+\subsection*{Definiert Aktionen:}
 \textbf{\_Essen(Rolf, Gericht)\_}\\
 Preconditions: At(Rollstuhl, Esszimmer) $\wedge$ At(Gericht, Esszimer) $\wedge$ Nahrung(Gericht) $\wedge$ (Hungrig(Rolf) $\vee \neg$Hungrig(Rolf))\\
 Postconditions: Satt(Rolf)
