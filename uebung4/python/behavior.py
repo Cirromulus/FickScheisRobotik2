@@ -13,12 +13,14 @@ class State:
     y = 0.
     z = 0.
     rot = 0.
+    weight = 0.
 
-    def __init__(self,x,y,z,rot):
+    def __init__(self,x,y,z,rot, weight):
         self.x = x
         self.y = y
         self.z = z
         self.rot = rot
+        self.weight = weight
 
 def checkIntersect(pos, wp):
     # for wall in walls:
@@ -29,6 +31,7 @@ def checkIntersect(pos, wp):
     return True
 
 def checkDistance(pos, wp):
+    #print "lines: " + str(pos) + ", " + str(wp)
     return intersect.get_intersect(pos[0], pos[1], wp[0], wp[1])
 
 def dist(p1, p2):
@@ -43,7 +46,7 @@ def initParticles():
     global particles
     data = pointCloudData["particles"]
     for i in range(getNumberOfParticles()):
-        part = State(data[i*3], data[i*3+1], data[i*3+2], 0.0)
+        part = State(data[i*3], data[i*3+1], data[i*3+2], 0.0, 1/getNumberOfParticles())
         particles.append(part)
     print "initialized"
 
@@ -64,7 +67,7 @@ def rot3d(ar, direction):
                           [0, 0, 1]])
     return np.dot(ar, rotMatrix)
 
-def whartIfWeWutHefBeenSehr(position, rotation):
+def probMeasurement(position, rotation):
     # Laser scanner positions fl, fr, bl, br
     basePos = np.array([[ 0.320234,  0.230233],
                         [ 0.320234, -0.230234],
@@ -96,7 +99,7 @@ def whartIfWeWutHefBeenSehr(position, rotation):
             appendLines("path", basePos[i][0], basePos[i][1], 0.5)
             appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
             appendLines("path", basePos[i][0], basePos[i][1], 0.5)
-    return [[checkDistance(basePos[i], multiLaserTargetPointsTranse[i][j])*3.5625 for j in range(len(multiLaserTargetPointsTranse[i]))] for i in range(len(multiLaserTargetPointsTranse))]
+    return [[checkDistance(basePos[i], multiLaserTargetPointsTranse[i][j])*4 for j in range(len(multiLaserTargetPointsTranse[i]))] for i in range(len(multiLaserTargetPointsTranse))]
 
 
 
@@ -138,18 +141,18 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
 
 
 
-    #print "Joystick input: (" + str(joystickLeft) + " : " +str(joystickRight) +")" + " direction: " + str(direction)
+    print "Joystick input: (" + str(joystickLeft) + " : " +str(joystickRight) +")" + " direction: " + str(direction)
 
     #print "Sensors:"
     #jeweils gegen den Uhrzeigersinn, wenn man von oben guckt
-    print "fl (%.2f, %.2f, %.2f, %.2f)" % (distance[0], distance[1],distance[2],distance[3])
-    print "fr (%.2f, %.2f, %.2f, %.2f)" % (distance[4], distance[5],distance[6],distance[7])
-    print "bl (%.2f, %.2f, %.2f, %.2f)" % (distance[8], distance[9],distance[10],distance[11])
-    print "br (%.2f, %.2f, %.2f, %.2f)" % (distance[12], distance[13],distance[13],distance[15])
-    print "Calced: "
-    kalk = whartIfWeWutHefBeenSehr(pos, direction)
-    for i in kalk:
-        print i
+    #print "fl (%.2f, %.2f, %.2f, %.2f)" % (distance[0], distance[1],distance[2],distance[3])
+    #print "fr (%.2f, %.2f, %.2f, %.2f)" % (distance[4], distance[5],distance[6],distance[7])
+    #print "bl (%.2f, %.2f, %.2f, %.2f)" % (distance[8], distance[9],distance[10],distance[11])
+    #print "br (%.2f, %.2f, %.2f, %.2f)" % (distance[12], distance[13],distance[13],distance[15])
+    #print "Calced: "
+    #calc = probMeasurement(pos, direction)
+    #for i in calc:
+    #    print i
 
     #Laser Mitte ist jeweils 45 deg verdreht
     #Winkeloffset zwischen den Laserstrahlen: 0.349 rad
