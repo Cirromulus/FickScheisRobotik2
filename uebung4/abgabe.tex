@@ -1,0 +1,32 @@
+\documentclass{../Vorlage/mat}
+\usepackage{upgreek}
+\usetikzlibrary{shapes.misc}
+\lstset{
+	basicstyle=\small
+}
+
+\begin{document}
+\maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{25.01.2017}{4} \\
+
+\section{Theorie zu Filtermethoden}
+\subsection*{Wahrscheinlichkeitsdichtefunktion}
+Die Gaussglockenkurve ist wie folgt definiert:
+\begin{equation}
+	\upvarphi(x, \sigma, \mu) = \dfrac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\dfrac{x-\mu}{\sigma}\right)^2}
+\end{equation}
+
+Das Integral jeder Wahrscheinlichkeitsfunktion ergibt immer 1. Das ist gleichbedeutend mit der Aussage, dass $P(\Omega) = 1$, also die Wahrscheinlichkeit, dass \textit{irgend ein} Ergebnis stattfindet, ist sicher.
+
+\subsection*{Abhängigkeit von Wahrscheinlichkeiten}
+
+Die Abhängigkeit zweier Zufallsvariablen bezeichnet man durch deren Covarianz, also $Cov(x,y) \neq 0$. Ferner sind zwei Zufallsvariablen genau dann unabhängig, wenn $P_{XY}(x_i;y_j) = P_X(x_i)\cdot P_Y(y_j)$ gilt. Daraus folgt, dass sie dann unabhängig sind , wenn $P(x) = P(x | y)$ und $P(y) = P(y | x)$ gilt.
+
+a) 
+$P(A) = 0.5 , P(B) = 0.25, P(A|B) = 1$, also abhängig.\\
+b)
+$P(A) = 0.5, P(B) = \frac{1}{16}, P(A|B) = 0$, also abhängig.\\
+c)
+$P(A) = 0.5, P(B) = 0.5, P(A|B) = P(B|A) = 0.5$, also unabhängig.
+
+
+\end{document}
