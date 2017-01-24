@@ -53,8 +53,24 @@ def initParticles():
 
 def particleFilter(particles, control, measurement):
     newParticles = []
+    resultParticles = []
     for i in range(len(particles)):
-        newParticles.append(particles[i] + control)
+        p = sampleParticle(particles[i], control)
+        p.weight = calcProb(probMeasurement((p.x,p.y),p.rot),measurement)
+        newParticles.append(p)
+    extParticles = []
+    for p in newParticles:
+        times = int(p.weight * 1000)
+        print p.weight
+        if times < 1:
+            times = 1
+        for i in range(times):
+            extParticles.append(p)
+    for i in range(len(particles)):
+        resultParticles.append(extParticles[np.random.randint(0, len(extParticles))])
+    return resultParticles
+
+
 
 def rot2d(ar, direction):
     rotMatrix = np.array([[np.cos(direction), -np.sin(direction)],
@@ -67,7 +83,35 @@ def rot3d(ar, direction):
                           [0, 0, 1]])
     return np.dot(ar, rotMatrix)
 
+def sampleParticle(particle, control):
+    global particles
+    magicDistortionRate = 3
+    control = [np.random.normal(control[0], magicDistortionRate), np.random.normal(control[1], magicDistortionRate)]
+    updateTime = 0.04
+    diam = 0.3
+    width= 0.5
+    circ = diam * np.pi
+    rang = [control[0] / (2 * np.pi) * circ * updateTime, control[1] / (2 * np.pi) * circ * updateTime]
+    print rang
+
+    dist = (rang[0] + rang[1])/2
+    angle = (rang[1] - rang[0]) / width
+    particle.x += dist * math.cos(particle.rot)
+    particle.y += dist * math.sin(particle.rot)
+    particle.rot += angle
+    print angle
+    particle.rot %= (2 * np.pi)
+    if particle.rot < -np.pi:
+        particle.rot += 2 * np.pi
+    elif particle.rot > np.pi:
+        particle.rot -= 2*np.pi
+    #add random action
+
+    return particle
+
+
 def probMeasurement(position, rotation):
+    global laserRange
     # Laser scanner positions fl, fr, bl, br
     basePos = np.array([[ 0.320234,  0.230233],
                         [ 0.320234, -0.230234],
@@ -82,7 +126,7 @@ def probMeasurement(position, rotation):
     basePos = [rot2d(bp, -rotation) for bp in basePos]
     basePos = [np.array(bp) + np.array([position[0], position[1]]) for bp in basePos]
 
-    laser = np.array([0, 4])
+    laser = np.array([0, laserRange])
     targetpoint = [np.array(rot2d(laser, i - rotation)) for i in baseRotz]  #45fucks
     multiLaserTargetPoints = []
     for elem in targetpoint:
@@ -91,20 +135,45 @@ def probMeasurement(position, rotation):
     multiLaserTargetPointsTranse = []
     for  i in range(len(basePos)):
         multiLaserTargetPointsTranse.append([sub+basePos[i] for sub in multiLaserTargetPoints[i]])
-    #print multiLaserTargetPointsTranse
-    clearLines("path")
-    configureLines("path", 2, 0.2, 0.8, 0.2)
+    # print multiLaserTargetPointsTranse
+    #clearLines("path")
+    #configureLines("path", 2, 0.2, 0.8, 0.2)
+    #for i in range(len(multiLaserTargetPointsTranse)):
+    #    for j in range(len(multiLaserTargetPointsTranse[i])):
+    #        appendLines("path", basePos[i][0], basePos[i][1], 0.5)
+    #        appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
+    #        appendLines("path", basePos[i][0], basePos[i][1], 0.5)
+    calced = []
     for i in range(len(multiLaserTargetPointsTranse)):
         for j in range(len(multiLaserTargetPointsTranse[i])):
-            appendLines("path", basePos[i][0], basePos[i][1], 0.5)
-            appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
-            appendLines("path", basePos[i][0], basePos[i][1], 0.5)
-    return [[checkDistance(basePos[i], multiLaserTargetPointsTranse[i][j])*4 for j in range(len(multiLaserTargetPointsTranse[i]))] for i in range(len(multiLaserTargetPointsTranse))]
+            dist = checkDistance(basePos[i], multiLaserTargetPointsTranse[i][j])
+            if dist > 1:
+                calced.append(laserRange)
+            else:
+                calced.append(dist * laserRange)
+    return calced
+
+
+def calcProb(list1, list2):
+    global laserRange
+    err2 = sum((np.array(list1) - np.array(list2))**2)
+    return 1 - err2 / (laserRange*len(list1))
+
+
+
+
+
+
+
 
 
 
 def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLeft, joystickRight):
     global init
+    global particles
+    # global position
+    global laserRange
+    laserLength = 4.
 
     flobz = np.array([-2, 0, 0])
     rotMatrix = np.array([[np.cos(direction), -np.sin(direction), 0],
@@ -119,6 +188,19 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
     if not init:
         initParticles()
         init = True
+        laserRange = 4.
+        # position = (pos, direction)
+
+    # p = State(position[0][0], position[0][1], position[0][2], position[1], 1)
+    #
+    # p = sampleParticle(p, (joystickLeft,joystickRight))
+    #
+    # print "X: " + str(p.x) + "/" + str(pos[0]) + ":" + str(p.x-pos[0])
+    # print "Y: " + str(p.y) + "/" + str(pos[1]) + ":" + str(p.y-pos[1])
+    # print "Z: " + str(p.z) + "/" + str(pos[2]) + ":" + str(p.z-pos[2])
+    # print "R: " + str(p.rot) + "/" + str(direction) + ":" + str(p.rot-direction)
+    #
+    # position = (pos, direction)
 
     #pos darf nut zur Kontrolle benutzt werden
     #print "Real Position: " + str(pos[0]) + ":" + str(pos[1])
@@ -142,25 +224,27 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
 
 
     print "Joystick input: (" + str(joystickLeft) + " : " +str(joystickRight) +")" + " direction: " + str(direction)
-
-    #print "Sensors:"
-    #jeweils gegen den Uhrzeigersinn, wenn man von oben guckt
-    #print "fl (%.2f, %.2f, %.2f, %.2f)" % (distance[0], distance[1],distance[2],distance[3])
-    #print "fr (%.2f, %.2f, %.2f, %.2f)" % (distance[4], distance[5],distance[6],distance[7])
-    #print "bl (%.2f, %.2f, %.2f, %.2f)" % (distance[8], distance[9],distance[10],distance[11])
-    #print "br (%.2f, %.2f, %.2f, %.2f)" % (distance[12], distance[13],distance[13],distance[15])
-    #print "Calced: "
-    #calc = probMeasurement(pos, direction)
-    #for i in calc:
-    #    print i
+    #
+    # print "Sensors:"
+    # # jeweils gegen den Uhrzeigersinn, wenn man von oben guckt
+    # print "fl (%.2f, %.2f, %.2f, %.2f)" % (distance[0], distance[1],distance[2],distance[3])
+    # print "fr (%.2f, %.2f, %.2f, %.2f)" % (distance[4], distance[5],distance[6],distance[7])
+    # print "bl (%.2f, %.2f, %.2f, %.2f)" % (distance[8], distance[9],distance[10],distance[11])
+    # print "br (%.2f, %.2f, %.2f, %.2f)" % (distance[12], distance[13],distance[13],distance[15])
+    # print "Calced: "
+    # calc = probMeasurement(pos, direction)
+    # prob = calcProb(calc, distance)
 
     #Laser Mitte ist jeweils 45 deg verdreht
     #Winkeloffset zwischen den Laserstrahlen: 0.349 rad
 
-    points = []
-
-    points.append([1,1])
-    points.append([2,2])
-
     #Es kann ein Array von punkten zurueck gegeben werden, diese werden in the 3D Szene gezeichnet
+
+    particles = particleFilter(particles, (joystickLeft, joystickRight), distance)
+
+    points = []
+    for p in particles:
+        points.append([p.x, p.y])
+
+    logMessage(str(len(points)) + " Points: " + str(points[0]) + str(particles[0].weight))
     return points
