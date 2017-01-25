@@ -8,7 +8,7 @@
 \begin{document}
 \maketitle{Sebastian Bliefert}{}{Nils Drebing}{}{Pascal Pieper}{}{25.01.2017}{4} \\
 
-\section{Theorie zu Filtermethoden}
+\section*{1. Theorie zu Filtermethoden}
 \subsection*{Wahrscheinlichkeitsdichtefunktion}
 Die Gaussglockenkurve ist wie folgt definiert:
 \begin{equation}
@@ -28,6 +28,7 @@ $P(A) = 0.5, P(B) = \frac{1}{16}, P(A|B) = 0$, also abhängig.\\
 c)
 $P(A) = 0.5, P(B) = 0.5, P(A|B) = P(B|A) = 0.5$, also unabhängig.
 
+
 \subsection*{Bayes-Theorem}
 Das Theorem beschreibt, dass die Wahrscheinlichkeit für ein Ereignis A unter der Annahme, dass ein anderes Ereignis B eingetreten ist, gleich der Wahrscheinlichkeit des Eintretens von B unter der Annahme von A multipliziert mit der reinen Wahrscheinlichkeit von A geteilt durch der reinen Wahrscheinlichkeit von B ist.
 
@@ -37,4 +38,32 @@ $P(L|W) = \frac{2}{3}, P(R|W) = \frac{3}{9}, P(L|B) = \frac{7}{11}, P(R|B) = \fr
 \\
 $P(L|W) = \dfrac{P(W|L) \cdot P(L)}{P(R)} = \dfrac{\frac{6}{13} \cdot \frac{13}{20}}{\frac{9}{20}} = \frac{2}{3}$\\
 $P(W|L) = \dfrac{P(L|W) \cdot P(W)}{P(L)} = \dfrac{\frac{2}{3} \cdot \frac{9}{20}}{\frac{13}{20}} = \frac{6}{13}$
+
+
+\section*{2. Partikelfilter zur Rollstuhllokalisation}
+\subsection*{Fehlerhafte Konvergenz}
+Grundsätzlich wäre es möglich, dass ein Partikelfilter zu einer falschen Position konvergiert.\\
+Nehmen wir eine hypothetische Karte mit zwei absolut gleich beschaffenen Sektoren an. Der Partikelfilter stellt in beiden Sektoren eine Position mit hoher Wahrscheinlichkeit fest. Durch Zufall wird jedoch beim ziehen aus dem temporären Partikelset die reale Position nicht gezogen sondern nur ihr Pendant im anderen Sektor. Ab diesem moment würde der Partikelfilter möglicherweise zur Position im falschen Sektor konvergieren. Dieses Szenario ist allerdings sehr konstruiert und somit entsprechend unwahrscheinlich.\\
+Im Normalfall sollte der Partikelfilter zur richtigen Position konvergieren, da auch bei sehr ähnlichen Positionen irgendwann ein entscheidender unterschied kommt durch den die falsche Position sehr unwahrscheinlich wird und somit die richtige Position als einzige wahrscheinliche verbleibt.
+\subsection*{Bestimmung des Zustandsvektors}
+Der Zustand des Rollstuhls sollte in diesem Szenario mindestens durch eine X,Y Position und eine Rotation beschrieben werden. Zusätzlich könnte noch eine Z Position und evtl. durch roll und neigungswinkel beschrieben werden. Letztere sind allerdings für die Lösung der Aufgabe nicht unbedingt relevant.
+\subsection*{Bestimmung des Messvektors}
+Der Messvektor beinhaltet die von den Laserscannern gemessenen Entfernungen. Praktisch wären hier noch informationen aus einer IMU um die Partikel zuverlässiger samplen zu können.
+\subsection*{Schritte der Filterung mit einem Partikelfilter}
+Der Algorithmus des Partikelfilters kann grob in zwei Teile aufgeteilt werden.
+\subsubsection*{1. Generierung des temporären Partikelsets}
+\begin{enumerate}
+	\item Es wird für jeden im Partikelset des vorherigen Durchlaufes enthaltenen Partikel ein neuer Partikel gesamplet. Dies geschieht jeweils auf Basis des entsprechenden Partikels aus dem vorherigen set verschoben anhand der Steuerdaten seit dem letzten Durchlauf. Dabei wird etwas Rauschen mit eingefügt, damit identische Partikel trotzdem leicht unterschiedlich neu gesamplet werden.
+	\item Für den jeden neu gesampleten Partikel wird die Wahrscheinlichkeit, dass er dem Realzustand entspricht berechnet. Dafür wird ein Messvektor für diesen Partikel Simuliert und mit dem tatsächlichen Messvektor verglichen. Diese Wahrscheinlichkeit wird im folgenden Schritt als das Gewicht bezeichnet.
+	\item Die neu gesampleten Partikel werden in das temporäre Partikelset eingetragen.
+\end{enumerate}
+\subsubsection*{2. Generierung des eigentlichen Partikelsets}
+Der folgende Vorgang wird so oft ausgeführt wie es Partikel im temporären Partikelset gibt.
+\begin{enumerate} 
+	\item Unter berücksichtigung des Gewichtes der einzelnen Partikel wird ein Partikel aus dem temporären Partikelset gezogen (mit zurücklegen). Die Wahrscheinlichkeit, dass ein spezifischer Partikel gezogen wird ist dabei Proportional zu seinem Gewicht.
+	\item Der gezogene Partikel wird nun zum eigentlichen Partikelset hinzugefügt.
+\end{enumerate}
+Das resultierende Partikelset enthält am Ende dieses Abschnittes genau so viele Partikel wie das temporäre Partikelset und somit auch genau so viele wie das aus dem vorherigen Durchgang. Weiterhin können (und sollen sogar) Partikel mehrfach enthalten sein, was wichtig für die Konvergenz zur richtigen Position ist.
+\subsubsection*{Übergabeparameter}
+Dem Partikelfilter müssen das Partikelset aus dem vorherigen Durchgang, der Messvektor und die Steuerungsinformationen seit dem letzten Durchgang übergeben werden.\\
 \end{document}
