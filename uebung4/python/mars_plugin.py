@@ -123,7 +123,7 @@ def update(marsData):
     if firstUpdate:
         firstUpdate = False
         configurePointCloud("waypoints", 8.0, 0.2, 0.6, 0.8)
-        configurePointCloud("particles", 4.0, 0.2, 0.8, 0.2)
+        configurePointCloud("particles", 6.0, 0.2, 0.8, 0.2)
         first=True
 
 
@@ -132,9 +132,10 @@ def update(marsData):
     if not first:
         pData = pointCloudData["particles"]
         for i in range(len(particles)):
-            print "i" + str(i)
+            logMessage("particle" + str(i) + ": " + str(particles[i]))
             pData[i*3] = particles[i][0]
             pData[i*3+1] = particles[i][1]
+            #pData[i*3+2] = 5.2
 
     setMotor("motor_links", joystickLeft * 0.5)
     setMotor("motor_rechts", joystickRight * 0.5)

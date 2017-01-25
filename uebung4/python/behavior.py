@@ -43,7 +43,7 @@ def dist(p1, p2):
 #bitte diese funktion nutzen um die Anzahl der Partikel zu setzen
 #(intitialisiert indern das array um die Partikel zu zeichnen)
 def getNumberOfParticles():
-    return 150
+    return 500
 
 #initializes particles as states
 def initParticles():
@@ -51,7 +51,11 @@ def initParticles():
     global particles
     data = pointCloudData["particles"]
     for i in range(getNumberOfParticles()):
-        part = State(random.uniform(-magicDistances,magicDistances), random.uniform(-magicDistances,magicDistances), 0., random.uniform(-np.pi, np.pi), 1./getNumberOfParticles())
+        # randomly initialize particles
+        part = State(random.uniform(-magicDistances,magicDistances),
+                         random.uniform(-magicDistances,magicDistances),
+                         0.,
+                         random.uniform(-np.pi, np.pi), 1./getNumberOfParticles())
         particles.append(part)
     particles[0] = State(0,0,0,0,1./getNumberOfParticles())
 
@@ -69,7 +73,6 @@ def particleFilter(particles, control, measurement):
             weightMax = p.weight
         weightSum += p.weight
 
-    #resultParticles.extend(heapq.nlargest(len(particles)/2, newParticles, key=lambda p: p.weight))
     for i in range(getNumberOfParticles()):
         rnd = np.random.uniform(0, weightSum)
         ws = 0
@@ -115,7 +118,8 @@ def sampleParticle(particle, control):
     diam = 0.3
     width= 0.54
     circ = diam * np.pi
-    rang = [left / (2 * np.pi * circ) * updateTime, right / (2 * np.pi * circ) * updateTime]
+    rang = [left / (2 * np.pi * circ) * updateTime,
+            right / (2 * np.pi * circ) * updateTime]
 
     dist = (rang[0] + rang[1])/2
     angle = (rang[1] - rang[0]) / float(width)
@@ -143,7 +147,9 @@ def probMeasurement(position, rotation):
     baseRotz = np.array([0.785, 3*0.785, -0.785, -3*0.785])
     directions = np.array([0.262, -1.309, 1.833, -2.879])
     magicWinkel_offset = 0.349
-    laserWinkelOffsets = np.array([magicWinkel_offset / 2 + magicWinkel_offset, magicWinkel_offset / 2, -magicWinkel_offset/2, -(magicWinkel_offset/2+magicWinkel_offset)])
+    laserWinkelOffsets = np.array([magicWinkel_offset / 2 + magicWinkel_offset,
+                            magicWinkel_offset / 2, -magicWinkel_offset/2,
+                            -(magicWinkel_offset/2+magicWinkel_offset)])
 
     basePos = [rot2d(bp, -rotation) for bp in basePos]
     basePos = [np.array(bp) + np.array([position[0], position[1]]) for bp in basePos]
