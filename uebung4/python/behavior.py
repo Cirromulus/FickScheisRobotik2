@@ -5,9 +5,11 @@ import intersect
 import math
 import numpy as np
 
+# particles as states
 particles = []
 init = False
 
+# class handling particles and weights
 class State:
     x = 0.
     y = 0.
@@ -43,26 +45,22 @@ def dist(p1, p2):
 def getNumberOfParticles():
     return 150
 
+#initializes particles as states
 def initParticles():
-    magicDistances = 7
+    magicDistances = 7 # set points on map
     global particles
     data = pointCloudData["particles"]
     for i in range(getNumberOfParticles()):
         part = State(random.uniform(-magicDistances,magicDistances), random.uniform(-magicDistances,magicDistances), 0., random.uniform(-np.pi, np.pi), 1./getNumberOfParticles())
-        #part = State(data[i*3], data[i*3+1], data[i*3+2], 0.0, 1/getNumberOfParticles())
         particles.append(part)
     particles[0] = State(0,0,0,0,1./getNumberOfParticles())
-    #print "initialized"
 
-#import heapq
 def particleFilter(particles, control, measurement):
     newParticles = []
     resultParticles = []
     for i in range(len(particles)):
         p = sampleParticle(particles[i], control)
         p.weight = calcProb(probMeasurement((p.x,p.y),p.rot),measurement) * p.weight
-        #if(p.weight > .50):
-            #print( "p: %.2f, %.2f, %.2f" %  (p.x, p.y,p.weight))
         newParticles.append(p)
     weightSum = 0.
     weightMax = 0.
@@ -78,28 +76,32 @@ def particleFilter(particles, control, measurement):
         for p in newParticles:
             ws += p.weight
             if ws >= rnd:
-                nutte = State(p.x, p.y, p.z, p.rot, p.weight)
-                nutte.weight /= weightMax
-                resultParticles.append(nutte)
+                resultParticle = State(p.x, p.y, p.z, p.rot, p.weight)
+                resultParticle.weight /= weightMax
+                resultParticles.append(resultParticle)
                 break
 
     return resultParticles
 
 
-
+#rotation in 2d
 def rot2d(ar, direction):
     rotMatrix = np.array([[np.cos(direction), -np.sin(direction)],
                           [np.sin(direction),  np.cos(direction)]])
     return np.dot(ar, rotMatrix)
 
+#rotation in 3d
 def rot3d(ar, direction):
     rotMatrix = np.array([[np.cos(direction), -np.sin(direction), 0],
                           [np.sin(direction),  np.cos(direction), 0],
                           [0, 0, 1]])
     return np.dot(ar, rotMatrix)
 
+#samples particle. takes particle to update and control input
 def sampleParticle(particle, control):
     global particles
+    ##### BEWEGUNGSMODELL #####
+    #calculates velocitys based on the control input
     megaMagicNoiseFactor = 5 + 0 * (1 - particle.weight)
     noiseFactorl = 1 + abs(control[0] * megaMagicNoiseFactor)
     noiseFactorr = 1 + abs(control[1] * megaMagicNoiseFactor)
@@ -120,19 +122,18 @@ def sampleParticle(particle, control):
     particle.x += dist * math.cos(particle.rot)
     particle.y += dist * math.sin(particle.rot)
     particle.rot += angle
-    #print angle
     particle.rot %= (2 * np.pi)
     if particle.rot < -np.pi:
         particle.rot += 2 * np.pi
     elif particle.rot > np.pi:
         particle.rot -= 2*np.pi
-    #add random action
 
     return particle
 
-
+## returns measurement on a given position with the given orientation
 def probMeasurement(position, rotation):
     global laserRange
+    #### PERCEPTION MODEL###
     # Laser scanner positions fl, fr, bl, br
     basePos = np.array([[ 0.320234,  0.230233],
                         [ 0.320234, -0.230234],
@@ -152,18 +153,11 @@ def probMeasurement(position, rotation):
     multiLaserTargetPoints = []
     for elem in targetpoint:
         multiLaserTargetPoints.append([np.array(rot2d(elem, offs)) for offs in laserWinkelOffsets])
-    #print multiLaserTargetPoints
+
     multiLaserTargetPointsTranse = []
     for  i in range(len(basePos)):
         multiLaserTargetPointsTranse.append([sub+basePos[i] for sub in multiLaserTargetPoints[i]])
-    # print multiLaserTargetPointsTranse
-    #clearLines("path")
-    #configureLines("path", 2, 0.2, 0.8, 0.2)
-    #for i in range(len(multiLaserTargetPointsTranse)):
-    #   for j in range(len(multiLaserTargetPointsTranse[i])):
-    #      appendLines("path", basePos[i][0], basePos[i][1], 0.5)
-    #       appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
-    #       appendLines("path", basePos[i][0], basePos[i][1], 0.5)
+
     calced = []
     for i in range(len(multiLaserTargetPointsTranse)):
         for j in range(len(multiLaserTargetPointsTranse[i])):
@@ -174,7 +168,7 @@ def probMeasurement(position, rotation):
                 calced.append(dist * laserRange)
     return calced
 
-
+## calculates the probability of a particle. Uses squared error
 def calcProb(list1, list2):
     global laserRange
     err2 = sum((np.array(list1) - np.array(list2))**2)
@@ -184,20 +178,8 @@ def calcProb(list1, list2):
 def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLeft, joystickRight):
     global init
     global particles
-    # global position
     global laserRange
-    laserLength = 4.
 
-    flobz = np.array([-2, 0, 0])
-    rotMatrix = np.array([[np.cos(direction), -np.sin(direction), 0],
-                          [np.sin(direction),  np.cos(direction), 0],
-                          [0, 0, 1]])
-    gurps = np.dot(flobz, rotMatrix)
-
-    bla = checkDistance(pos, pos + gurps)
-    #print "Pohs" + str(pos)
-    #print "dist" + str(bla)
-    #print "Dirce" + str(direction)
     if not init:
         initParticles()
         init = True
