@@ -35,39 +35,54 @@ def checkDistance(pos, wp):
     return intersect.get_intersect(pos[0], pos[1], wp[0], wp[1])
 
 def dist(p1, p2):
+    #print "length particle: " + str(len(particles))
     return np.sum(np.square(np.subtract(p1, p2)))
 
 #bitte diese funktion nutzen um die Anzahl der Partikel zu setzen
 #(intitialisiert indern das array um die Partikel zu zeichnen)
 def getNumberOfParticles():
-    return 100
+    return 150
 
 def initParticles():
+    magicDistances = 7
     global particles
     data = pointCloudData["particles"]
     for i in range(getNumberOfParticles()):
-        part = State(data[i*3], data[i*3+1], data[i*3+2], 0.0, 1/getNumberOfParticles())
+        part = State(random.uniform(-magicDistances,magicDistances), random.uniform(-magicDistances,magicDistances), 0., random.uniform(-np.pi, np.pi), 1./getNumberOfParticles())
+        #part = State(data[i*3], data[i*3+1], data[i*3+2], 0.0, 1/getNumberOfParticles())
         particles.append(part)
-    print "initialized"
+    particles[0] = State(0,0,0,0,1./getNumberOfParticles())
+    #print "initialized"
 
-
+#import heapq
 def particleFilter(particles, control, measurement):
     newParticles = []
     resultParticles = []
     for i in range(len(particles)):
         p = sampleParticle(particles[i], control)
-        p.weight = calcProb(probMeasurement((p.x,p.y),p.rot),measurement)
+        p.weight = calcProb(probMeasurement((p.x,p.y),p.rot),measurement) * p.weight
+        #if(p.weight > .50):
+            #print( "p: %.2f, %.2f, %.2f" %  (p.x, p.y,p.weight))
         newParticles.append(p)
-    extParticles = []
+    weightSum = 0.
+    weightMax = 0.
     for p in newParticles:
-        times = int(p.weight * 1000)
-        print p.weight
-        if times < 1:
-            times = 1
-        for i in range(times):
-            extParticles.append(p)
-    for i in range(len(particles)):
-        resultParticles.append(extParticles[np.random.randint(0, len(extParticles))])
+        if(p.weight > weightMax):
+            weightMax = p.weight
+        weightSum += p.weight
+
+    #resultParticles.extend(heapq.nlargest(len(particles)/2, newParticles, key=lambda p: p.weight))
+    for i in range(getNumberOfParticles()):
+        rnd = np.random.uniform(0, weightSum)
+        ws = 0
+        for p in newParticles:
+            ws += p.weight
+            if ws >= rnd:
+                nutte = State(p.x, p.y, p.z, p.rot, p.weight)
+                nutte.weight /= weightMax
+                resultParticles.append(nutte)
+                break
+
     return resultParticles
 
 
@@ -85,21 +100,27 @@ def rot3d(ar, direction):
 
 def sampleParticle(particle, control):
     global particles
-    magicDistortionRate = 3
-    control = [np.random.normal(control[0], magicDistortionRate), np.random.normal(control[1], magicDistortionRate)]
-    updateTime = 0.04
+    megaMagicNoiseFactor = 5 + 0 * (1 - particle.weight)
+    noiseFactorl = 1 + abs(control[0] * megaMagicNoiseFactor)
+    noiseFactorr = 1 + abs(control[1] * megaMagicNoiseFactor)
+    left = control[0]
+    right = control[1]
+    if(noiseFactorl > 0):
+        left = np.random.normal(control[0], noiseFactorl)
+    if(noiseFactorr > 0):
+        right = np.random.normal(control[1], noiseFactorr)
+    updateTime = 0.0175
     diam = 0.3
-    width= 0.5
+    width= 0.54
     circ = diam * np.pi
-    rang = [control[0] / (2 * np.pi) * circ * updateTime, control[1] / (2 * np.pi) * circ * updateTime]
-    print rang
+    rang = [left / (2 * np.pi * circ) * updateTime, right / (2 * np.pi * circ) * updateTime]
 
     dist = (rang[0] + rang[1])/2
-    angle = (rang[1] - rang[0]) / width
+    angle = (rang[1] - rang[0]) / float(width)
     particle.x += dist * math.cos(particle.rot)
     particle.y += dist * math.sin(particle.rot)
     particle.rot += angle
-    print angle
+    #print angle
     particle.rot %= (2 * np.pi)
     if particle.rot < -np.pi:
         particle.rot += 2 * np.pi
@@ -139,10 +160,10 @@ def probMeasurement(position, rotation):
     #clearLines("path")
     #configureLines("path", 2, 0.2, 0.8, 0.2)
     #for i in range(len(multiLaserTargetPointsTranse)):
-    #    for j in range(len(multiLaserTargetPointsTranse[i])):
-    #        appendLines("path", basePos[i][0], basePos[i][1], 0.5)
-    #        appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
-    #        appendLines("path", basePos[i][0], basePos[i][1], 0.5)
+    #   for j in range(len(multiLaserTargetPointsTranse[i])):
+    #      appendLines("path", basePos[i][0], basePos[i][1], 0.5)
+    #       appendLines("path", multiLaserTargetPointsTranse[i][j][0], multiLaserTargetPointsTranse[i][j][1], 0.5)
+    #       appendLines("path", basePos[i][0], basePos[i][1], 0.5)
     calced = []
     for i in range(len(multiLaserTargetPointsTranse)):
         for j in range(len(multiLaserTargetPointsTranse[i])):
@@ -157,15 +178,7 @@ def probMeasurement(position, rotation):
 def calcProb(list1, list2):
     global laserRange
     err2 = sum((np.array(list1) - np.array(list2))**2)
-    return 1 - err2 / (laserRange*len(list1))
-
-
-
-
-
-
-
-
+    return (1 - err2 / ((laserRange**2)*len(list1)))
 
 
 def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLeft, joystickRight):
@@ -182,9 +195,9 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
     gurps = np.dot(flobz, rotMatrix)
 
     bla = checkDistance(pos, pos + gurps)
-    print "Pohs" + str(pos)
-    print "dist" + str(bla)
-    print "Dirce" + str(direction)
+    #print "Pohs" + str(pos)
+    #print "dist" + str(bla)
+    #print "Dirce" + str(direction)
     if not init:
         initParticles()
         init = True
@@ -194,12 +207,7 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
     # p = State(position[0][0], position[0][1], position[0][2], position[1], 1)
     #
     # p = sampleParticle(p, (joystickLeft,joystickRight))
-    #
-    # print "X: " + str(p.x) + "/" + str(pos[0]) + ":" + str(p.x-pos[0])
-    # print "Y: " + str(p.y) + "/" + str(pos[1]) + ":" + str(p.y-pos[1])
-    # print "Z: " + str(p.z) + "/" + str(pos[2]) + ":" + str(p.z-pos[2])
-    # print "R: " + str(p.rot) + "/" + str(direction) + ":" + str(p.rot-direction)
-    #
+    #0
     # position = (pos, direction)
 
     #pos darf nut zur Kontrolle benutzt werden
@@ -223,7 +231,7 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
 
 
 
-    print "Joystick input: (" + str(joystickLeft) + " : " +str(joystickRight) +")" + " direction: " + str(direction)
+    #print "Joystick input: (" + str(joystickLeft) + " : " +str(joystickRight) +")" + " direction: " + str(direction)
     #
     # print "Sensors:"
     # # jeweils gegen den Uhrzeigersinn, wenn man von oben guckt
@@ -239,12 +247,24 @@ def doBehavior(distance, direction, pos, marsData, waypoints, walls, joystickLef
     #Winkeloffset zwischen den Laserstrahlen: 0.349 rad
 
     #Es kann ein Array von punkten zurueck gegeben werden, diese werden in the 3D Szene gezeichnet
-
+    clearLines("path")
+    configureLines("path", 2, 0.2, 0.8, 0.2)
     particles = particleFilter(particles, (joystickLeft, joystickRight), distance)
 
     points = []
+    probPosition = [0.0, 0.0]
+    meanX = 0.
+    meanY = 0.
     for p in particles:
         points.append([p.x, p.y])
+        meanX += p.x
+        meanY += p.y
+    probPosition = [meanX/len(particles), meanY/len(particles)]
 
-    logMessage(str(len(points)) + " Points: " + str(points[0]) + str(particles[0].weight))
+    print "real pos: " + str(pos)
+    print "estimated pos: " + str(probPosition)
+
+    #necessary for drawing a single point
+    points[int(random.uniform(0,len(points)-1))] = [-8,-7]
+    #logMessage(str(len(points)) + " Points: " + str(points[0]) + str(particles[0].weight))
     return points
