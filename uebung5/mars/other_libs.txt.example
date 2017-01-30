@@ -1,0 +1,9 @@
+# additional list of libraries to be loaded after the core libraries have been loaded
+connexion_plugin
+data_broker_gui
+cfg_manager_gui
+lib_manager_gui
+entity_view
+SkyDomePlugin
+log_console
+

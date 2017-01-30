@@ -1,0 +1,85 @@
+Windows:
+  - name: CFG/Window Height
+    type: int
+    value: 513
+  - name: CFG/Window Left
+    type: int
+    value: 195
+  - name: CFG/Window Top
+    type: int
+    value: 519
+  - name: CFG/Window Width
+    type: int
+    value: 849
+  - name: ConfigMapWidget/Window Height
+    type: int
+    value: 400
+  - name: ConfigMapWidget/Window Left
+    type: int
+    value: 40
+  - name: ConfigMapWidget/Window Top
+    type: int
+    value: 40
+  - name: ConfigMapWidget/Window Width
+    type: int
+    value: 400
+  - name: Console/Window Height
+    type: int
+    value: 229
+  - name: Console/Window Left
+    type: int
+    value: 1127
+  - name: Console/Window Top
+    type: int
+    value: 803
+  - name: Console/Window Width
+    type: int
+    value: 595
+  - name: DialogLights/Window Height
+    type: int
+    value: 400
+  - name: DialogLights/Window Left
+    type: int
+    value: 40
+  - name: DialogLights/Window Top
+    type: int
+    value: 40
+  - name: DialogLights/Window Width
+    type: int
+    value: 400
+  - name: Entity View/Window Height
+    type: int
+    value: 661
+  - name: Entity View/Window Left
+    type: int
+    value: 40
+  - name: Entity View/Window Top
+    type: int
+    value: 45
+  - name: Entity View/Window Width
+    type: int
+    value: 988
+  - name: LibManagerWidget/Window Height
+    type: int
+    value: 400
+  - name: LibManagerWidget/Window Left
+    type: int
+    value: 40
+  - name: LibManagerWidget/Window Top
+    type: int
+    value: 40
+  - name: LibManagerWidget/Window Width
+    type: int
+    value: 400
+  - name: SelectionTree/Window Height
+    type: int
+    value: 400
+  - name: SelectionTree/Window Left
+    type: int
+    value: 40
+  - name: SelectionTree/Window Top
+    type: int
+    value: 40
+  - name: SelectionTree/Window Width
+    type: int
+    value: 400

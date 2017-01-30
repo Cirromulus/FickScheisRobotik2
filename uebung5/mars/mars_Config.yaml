@@ -1,0 +1,4 @@
+Config:
+  - name: config_path
+    type: string
+    value: .

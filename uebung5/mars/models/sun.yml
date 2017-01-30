@@ -1,0 +1,13 @@
+lightlist:
+    name: sun
+    position: {x: 10, y: 10, z: 6}
+    ambient: {a: 1, r: 0.84, g: 0.84, b: 0.84}
+    diffuse: {a: 1, r: 1, g: 1, b: 1}
+    specular: {a: 1, r: 1, g: 1, b: 1}
+    constantAttenuation: 1.4
+    type: 1
+    directional: true
+
+graphicOptions:
+    clearColor: {a: 1, r: 0.55, g: 0.67, b: 0.88}
+    fogEnabled: false
