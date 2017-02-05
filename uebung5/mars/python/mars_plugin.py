@@ -36,7 +36,7 @@ def addPointCloudData(name, points):
             points[i*3] = 0.0
             points[i*3+1] = 0.0
             points[i*3+2] = 0.5
-            
+
 def loadPoints(fName):
     array = []
     with open(fName) as f:
@@ -69,7 +69,7 @@ def init():
     requestSensor("wheels")
     requestConfig("VirtualJoystick", "x")
     requestConfig("VirtualJoystick", "y")
-    
+
     setConfig("Graphics", "showCoords", 0)
     setConfig("Scene", "skydome_enabled", 1)
     setConfig("Simulator", "calc_ms", 40)
@@ -115,8 +115,8 @@ def readSensor(marsData):
     direction = math.radians(getVector3(marsData["Sensors"]["rotation"]).z)
 
 def update(marsData):
-    global distance, t, pointCloudData, walls, numParticles, wheels
-    global firstUpdate
+    global distance, t, pointCloudData, walls, numParticles, wheels, pos
+    global firstUpdate, direction
 
     clearDict()
     if firstUpdate:
@@ -127,10 +127,10 @@ def update(marsData):
 
     joystickLeft = marsData["Config"]["VirtualJoystick"]["x"]
     joystickRight = marsData["Config"]["VirtualJoystick"]["y"]
-    
+
 
     behavior.doBehavior(distance, joystickLeft, joystickRight,
-                        wheels, marsData)
+                        wheels, marsData, pos, direction)
 
     # pf.generate_measurement(np.array([pos[0], pos[1],
     #                                   direction, 1.]),
