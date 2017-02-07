@@ -13,10 +13,12 @@ pointCloudData = {}
 updatePath = True
 numParticles = 100
 bestP = None
+hinten_ = np.array([-.3,0.])
+vorne_ = np.array([1.,0.])
 
 def initBehavior(waypoints_, walls_, pointCloudData_,
                  numParticles_):
-     global waypoints, walls, averageP
+     global waypoints, walls, averageP, timer
      waypoints = waypoints_
      walls = walls_
      pointCloudData = pointCloudData_
@@ -32,14 +34,17 @@ def initBehavior(waypoints_, walls_, pointCloudData_,
              np.array([-0.5, -0.5, -0.1]),
              np.array([0.5, 0.5, 0.1]))
      averageP = np.array([0.,0.,0.,0.])
-
-     print(angle_between(np.array([1,0]), np.array([0,1])) * (180/np.pi))
-     print(angle_between(np.array([0,1]), np.array([1,0])) * (180/np.pi))
+     timer = maxTimer
 
 def runAstar():
      global path, waypoints, walls, updatePath, averageP
      updatePath = False
-     path = astar.run(waypoints, walls, np.array([averageP[0], averageP[1]]),
+     curr = np.array([averageP[0], averageP[1]])
+     selfRot = averageP[3]
+     rotMatrix = np.array([[np.cos(selfRot), -np.sin(selfRot)],
+                          [np.sin(selfRot),  np.cos(selfRot)]])
+     hinten = rotMatrix.dot(hinten_)
+     path = astar.run(waypoints, walls, hinten + curr,
                       np.array([4., 5.]))
      clearLines("path")
      configureLines("path", 5, 0.8, 0.6, 0.2)
@@ -74,12 +79,39 @@ def runParticleFilter(distance, wheels):
     appendLines("guess", bestP[0], bestP[1], 0.5)
     appendLines("guess", p2[0], p2[1], 0.5)
 
-def obstacleAvoidance(intention):
-    if(False):
-        #Avoid obstacle
-        return (-1., -1.)
-    else:
-        return intention
+def obstacleAvoidance(intention, distance):
+    if(min(distance) < .25):
+        print("Sensor too close: " + str(np.argmin(distance)))
+        p = np.argmin(distance)
+        if(p == 0):
+            #front left
+            return (-1.,-.8)
+        if(p == 7):
+            #front right
+            return (-.8,-1.)
+        if(p == 11):
+            #rear left
+            return ( 1., .8)
+        if(p == 12):
+            #rear right
+            return ( .8, .1)
+        if(min(distance) < .16):
+            if(p < 8):
+                #front
+                if(p < 4):
+                    #left
+                    return (-.8,-1.)
+                else:
+                    return (-1.,-.8)
+            else:
+                #rear
+                if(p < 12):
+                    #left
+                    return ( 1., .8)
+                else:
+                    #right
+                    return ( .8, .1)
+    return intention
 
 
 def angle_between(v1, v2):
@@ -99,15 +131,19 @@ def autonomousDrive():
     global path, averageP, updatePath
     #mega KI thinking
     nextTarget = path[-2]
-    print("nextTarget: "+ str(nextTarget))
-    diff = nextTarget - np.array([averageP[0], averageP[1]])
-    print("self: " +str([averageP[0], averageP[1]]))
-    print("diff: "+ str(diff) + " ("+ str(np.linalg.norm(diff)) +")")
-    vorne = np.array([1,0])
     selfRot = averageP[3]
     rotMatrix = np.array([[np.cos(selfRot), -np.sin(selfRot)],
                          [np.sin(selfRot),  np.cos(selfRot)]])
-    vorne = rotMatrix.dot(vorne)
+    vorne = rotMatrix.dot(vorne_)
+    hinten= rotMatrix.dot(hinten_)
+    if(len(path) <= 2):
+        #last waypoint, we want to land on top
+        print("Last Waypoint to reach")
+        hinten = np.array([0.,0.])
+    print("nextTarget: "+ str(nextTarget))
+    diff = nextTarget - (np.array([averageP[0], averageP[1]]) + hinten)
+    print("self: " +str([averageP[0], averageP[1]]))
+    print("diff: "+ str(diff) + " ("+ str(np.linalg.norm(diff)) +")")
     angleDiff = normAngle(angle_between(vorne,diff))
 
     if(np.linalg.norm(diff) < .08):
@@ -118,10 +154,12 @@ def autonomousDrive():
             return (0.,0.)
         updatePath = True
 
+
     print("Angle to Waypoint: " + str(angleDiff*(180/np.pi)) + "deg")
-    if(abs(angleDiff) < .05 or np.linalg.norm(diff) < .9):
+    if(abs(angleDiff) < .03 or np.linalg.norm(diff) < .9):
         return (1.8,1.8)
     else:
+        updatePath = True #not shure if this is an improvement
         return (np.sign(angleDiff) * .5, np.sign(angleDiff) *-.5)
 
 def doBehavior(distance, joystickLeft, joystickRight, wheels,
@@ -131,19 +169,19 @@ def doBehavior(distance, joystickLeft, joystickRight, wheels,
     if updatePath:
          runAstar()
 
-    #runParticleFilter(distance, wheels)
+    runParticleFilter(distance, wheels)
 
     xdiff = pos[0] - averageP[0]
     ydiff = pos[1] - averageP[1]
-    adiff = direction - averageP[3]
-    print("Diff of belief: x: " + str(xdiff) + ", y: " + str(ydiff) + ", r: " + str(adiff))
+    adiff = (direction - averageP[3])*(180/np.pi)
+    print("Diff of belief: x: " + str(xdiff) + ", y: " + str(ydiff) + ", r: " + str(adiff) + "deg")
     averageP = np.array([pos[0], pos[1], pos[2], direction])
 
 
     dreiv = autonomousDrive()
-    dreiv = obstacleAvoidance(dreiv)
+    dreiv = obstacleAvoidance(dreiv, distance)
+
     if(abs(joystickLeft) > .5 and abs(joystickRight) > .5):
         dreiv = (joystickLeft, joystickRight)
-
     left_actuator = dreiv[0]
     right_actuator = dreiv[1]
