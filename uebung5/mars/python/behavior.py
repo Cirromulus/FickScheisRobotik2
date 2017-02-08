@@ -15,6 +15,10 @@ numParticles = 100
 bestP = None
 hinten_ = np.array([-.3,0.])
 vorne_ = np.array([1.,0.])
+rueqwertz = True
+if(rueqwertz):
+    vorne_ = np.array([-1.,0.])
+
 
 def initBehavior(waypoints_, walls_, pointCloudData_,
                  numParticles_):
@@ -34,7 +38,6 @@ def initBehavior(waypoints_, walls_, pointCloudData_,
              np.array([-0.5, -0.5, -0.1]),
              np.array([0.5, 0.5, 0.1]))
      averageP = np.array([0.,0.,0.,0.])
-     timer = maxTimer
 
 def runAstar():
      global path, waypoints, walls, updatePath, averageP
@@ -157,9 +160,13 @@ def autonomousDrive():
 
     print("Angle to Waypoint: " + str(angleDiff*(180/np.pi)) + "deg")
     if(abs(angleDiff) < .03 or np.linalg.norm(diff) < .9):
-        return (1.8,1.8)
+        if not rueqwertz:
+            return (1.8,1.8)
+        else:
+            return (-1.8,-1.8)
     else:
-        updatePath = True #not shure if this is an improvement
+        if not rueqwertz:
+            updatePath = True #not shure if this is an improvement
         return (np.sign(angleDiff) * .5, np.sign(angleDiff) *-.5)
 
 def doBehavior(distance, joystickLeft, joystickRight, wheels,
