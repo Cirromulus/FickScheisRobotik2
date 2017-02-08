@@ -3,7 +3,10 @@ import astar
 import particlefilter as pf
 import numpy as np
 import math
+import time
 
+c = 0
+start = time.time() - 4
 right_actuator = 0.
 left_actuator = 0.
 walls = None
@@ -15,8 +18,8 @@ numParticles = 100
 bestP = None
 hinten_ = np.array([-.3,0.])
 vorne_ = np.array([1.,0.])
-rueqwertz = True
-if(rueqwertz):
+backwards = False
+if(backwards):
     vorne_ = np.array([-1.,0.])
 
 
@@ -33,6 +36,7 @@ def initBehavior(waypoints_, walls_, pointCloudData_,
      configureLines("debugRays2", 2, 0.5, 1.0, 0.4)
      configurePointCloud("waypoints", 8.0, 0.2, 0.6, 0.8)
      configurePointCloud("particles", 4.0, 0.9, 0.3, 0.9)
+     configurePointCloud("weg", 9.0, 1., 0.7, 0.0)
      # init particle filter
      pf.init(numParticles, 3,
              np.array([-0.5, -0.5, -0.1]),
@@ -160,21 +164,30 @@ def autonomousDrive():
 
     print("Angle to Waypoint: " + str(angleDiff*(180/np.pi)) + "deg")
     if(abs(angleDiff) < .03 or np.linalg.norm(diff) < .9):
-        if not rueqwertz:
+        if not backwards:
             return (1.8,1.8)
         else:
             return (-1.8,-1.8)
     else:
-        if not rueqwertz:
+        if not backwards:
             updatePath = True #not shure if this is an improvement
         return (np.sign(angleDiff) * .5, np.sign(angleDiff) *-.5)
 
 def doBehavior(distance, joystickLeft, joystickRight, wheels,
                marsData, pos, direction):
-    global updatePath, left_actuator, right_actuator, averageP
+    global updatePath, left_actuator, right_actuator, averageP, c, start
 
     if updatePath:
          runAstar()
+
+    print time.time()
+    print start
+    if(time.time() - start > 1):
+        start = time.time()
+        pointCloudData["weg"][c*3] = pos[0]
+        pointCloudData["weg"][c*3+1] = pos[1]
+        if c < 800:
+            c += 1
 
     runParticleFilter(distance, wheels)
 

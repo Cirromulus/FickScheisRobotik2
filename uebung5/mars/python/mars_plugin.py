@@ -36,6 +36,11 @@ def addPointCloudData(name, points):
             points[i*3] = 0.0
             points[i*3+1] = 0.0
             points[i*3+2] = 0.5
+    if name == "weg":
+        for i in range(800):
+            points[i*3] = 0.0
+            points[i*3+1] = 0.0
+            points[i*3+2] = 0.5
 
 def loadPoints(fName):
     array = []
@@ -80,6 +85,7 @@ def init():
     logMessage("loaded " + str(len(waypoints)) + " waypoints")
     createPointCloud("waypoints", len(waypoints))
     createPointCloud("particles", numParticles)
+    createPointCloud("weg", 800)
     walls = loadPoints("walls.txt")
     #intersect.initStaticLines(walls)
     logMessage("loaded " + str(len(walls)) + " walls")

@@ -11,6 +11,7 @@
 \centering
 \includegraphics[width=\linewidth]{aufgabe1}
 \label{fig:aufgabe1}
+\caption{Subsumption-Architektur des Roboters}
 \end{figure}
 
 Bei der Erstellung des angegebenen Modells haben wir uns folgendes gedacht:\\
@@ -19,7 +20,6 @@ Bei der Erstellung des angegebenen Modells haben wir uns folgendes gedacht:\\
 	\item \texttt{forward} sendet durchgehend eine konstante Richtung nämlich geradeaus. Ansonsten fährt es mit einer konstanten Geschwindigkeit geradeaus solange es kein halt Signal bekommt.
 	\item \texttt{turn} bekommt Informationen über die gewünschte Bewegungsrichtung und von einem Hindernissensor beliebiger Art. Mit diesen Informationen dreht \texttt{turn} den Roboter in die richtige Richtung. Es kann den Roboter ebenfalls zum stoppen bringen indem es ein halt Signal an \texttt{forward schickt.}
 \end{itemize}
-\\
 \textbf{Ebene 2:}
 \begin{itemize}
 	\item \texttt{shake} sendet das Schüttelsignal direkt an die Aktuatoren. Weiterhin wird ein start Signal an \texttt{approach fire} gesendet.
@@ -32,12 +32,33 @@ Bei der Erstellung des angegebenen Modells haben wir uns folgendes gedacht:\\
 
 \section*{Aufgabe 2}
 \subsection*{a)}
-Obstacle Avoidance überprüft die Sensoren, ob die Inneren Sensoren unter 25 cm und die äußeren Sensoren unter 15 cm melden. Wenn sie das tun, wird entweder zurück oder vorwärts leicht links oder rechts, je nach Seite, ausgewichen.
+Die Implementierung ist aus dem Sourcecode der \textit{behaviour.py} zu entnehmen.
+
+Obstacle Avoidance überprüft die Sensoren, ob die inneren Sensoren unter 25 cm und die äußeren Sensoren unter 15 cm melden. Wenn sie das tun, wird entweder zurück oder vorwärts leicht links oder rechts, je nach Seite, ausgewichen.
 
 Der Autonomous Drive überprüft, ob seine Ausrichtung zu dem nächsten Wegpunkt innerhalb einer Toleranzgrenze liegt. Wenn ja, fährt er geradeaus. Wenn nicht, dreht er sich, bis er ihn trifft. Weiterhin merkt er, wenn sein Rotationspunkt (nicht der Mittelpunkt) innerhalb einer Toleranzentfernung liegt. Sobald das erreicht ist, aktualisiert er seinen  Wegfindungsalgorithmus (Weg), und fährt weiter. Wenn der letzte Wegpunkt erreicht wird (Mit der Mitte, und nicht mit dem Rotationspunkt), wird angehalten.
+\newpage
 \subsection*{b)}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.3]{forwards}
+\label{fig:aufgabe2b1}
+\caption{Weg der Rollstuhls beim Vorwärtsfahren (Punkte in Orange sind tatsächlicher Weg)}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[scale=0.3]{backwards}
+\label{fig:aufgabe2b2}
+\caption{Weg der Rollstuhls beim Rückwärtsfahren (Punkte in Orange sind tatsächlicher Weg)}
+
+\end{figure}
+
 
 \subsection*{c)}
-Wahrscheinlich wollen sie darauf hinaus, dass sich der Rotationspunkt dann besser verhält. Ist aber bei uns abgefangen. Außerdem rollt der Rolli. Er hat erst ein paar Anfangsschwierigkeiten, kommt aber zum Ziel.
+Das Umschalten der Modi wird durch eine Änderung der \textit{backwards}-Variable in der \textit{behaviour.py} möglich.
+
+Aus Sicht der Implementierung ist die Steuerung für das Vorwärtsfahren lediglich invertiert und somit kein großer Programmieraufwand. Allerdings fährt der Rollstuhl zunächst einmal rückwärts im Kreis, bis er anschließend dem Weg folgt.\\
+Physikalisch betrachtet verhält sich der Rollstuhl bei der Rotation während des Rückwärtsfahrens insgesamt stabiler als bei einer Vorwärtsbewegung. 
 
 \end{document}
