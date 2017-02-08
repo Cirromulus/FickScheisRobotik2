@@ -18,7 +18,7 @@ Bei der Erstellung des angegebenen Modells haben wir uns folgendes gedacht:\\
 \begin{itemize}
 	\item \texttt{forward} sendet durchgehend eine konstante Richtung nämlich geradeaus. Ansonsten fährt es mit einer konstanten Geschwindigkeit geradeaus solange es kein halt Signal bekommt.
 	\item \texttt{turn} bekommt Informationen über die gewünschte Bewegungsrichtung und von einem Hindernissensor beliebiger Art. Mit diesen Informationen dreht \texttt{turn} den Roboter in die richtige Richtung. Es kann den Roboter ebenfalls zum stoppen bringen indem es ein halt Signal an \texttt{forward schickt.}
-\end{itemize}\\
+\end{itemize}
 \\
 \textbf{Ebene 2:}
 \begin{itemize}
@@ -32,7 +32,11 @@ Bei der Erstellung des angegebenen Modells haben wir uns folgendes gedacht:\\
 
 \section*{Aufgabe 2}
 \subsection*{a)}
+Obstacle Avoidance überprüft die Sensoren, ob die Inneren Sensoren unter 25 cm und die äußeren Sensoren unter 15 cm melden. Wenn sie das tun, wird entweder zurück oder vorwärts leicht links oder rechts, je nach Seite, ausgewichen.
+
+Der Autonomous Drive überprüft, ob seine Ausrichtung zu dem nächsten Wegpunkt innerhalb einer Toleranzgrenze liegt. Wenn ja, fährt er geradeaus. Wenn nicht, dreht er sich, bis er ihn trifft. Weiterhin merkt er, wenn sein Rotationspunkt (nicht der Mittelpunkt) innerhalb einer Toleranzentfernung liegt. Sobald das erreicht ist, aktualisiert er seinen  Wegfindungsalgorithmus (Weg), und fährt weiter. Wenn der letzte Wegpunkt erreicht wird (Mit der Mitte, und nicht mit dem Rotationspunkt), wird angehalten.
 \subsection*{b)}
+
 \subsection*{c)}
 Wahrscheinlich wollen sie darauf hinaus, dass sich der Rotationspunkt dann besser verhält. Ist aber bei uns abgefangen.
 
